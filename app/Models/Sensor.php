@@ -6,7 +6,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class Sensor extends Model
 {
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'line_id'];
+
+    protected function casts(): array
+    {
+        return [
+            'halve_duration' => 'boolean',
+        ];
+    }
+
+    public function line(){
+        return $this->belongsTo(Line::class);
+    }
 
     // Relation to Patterns - Many to Many
     public function patterns(){

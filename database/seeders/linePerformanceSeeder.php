@@ -12,10 +12,46 @@ class LinePerformanceSeeder extends Seeder
      */
     public function run(): void
     {
-        LinePerformance::create(['month'  => 'August',    'year'   => '2025', 'target' => 88.0, 'actual' => 84.6]);
-        LinePerformance::create(['month'  => 'September', 'year'   => '2025', 'target' => 88.0, 'actual' => 84.8]);
-        LinePerformance::create(['month'  => 'October',   'year'   => '2025', 'target' => 88.0, 'actual' => 86.9]);
-        LinePerformance::create(['month'  => 'November',  'year'   => '2025', 'target' => 88.0, 'actual' => 88.2]);
-        LinePerformance::create(['month'  => 'December',  'year'   => '2025', 'target' => 88.0, 'actual' => 84.6]);
+        $datas=[
+            [
+                'month'   => 'August',
+                'year'    => '2025',
+                'target'  => 88.0,
+                'actual'  => 84.6,
+                'line_id' => 2
+            ],
+            [
+                'month'   => 'September',
+                'year'    => '2025',
+                'target'  => 88.0,
+                'actual'  => 84.8,
+                'line_id' => 2
+            ],
+            [
+                'month'   => 'October',
+                'year'    => '2025',
+                'target'  => 88.0,
+                'actual'  => 86.9,
+                'line_id' => 2
+            ],
+            [
+                'month'   => 'November',
+                'year'    => '2025',
+                'target'  => 88.0,
+                'actual'  => 88.2,
+                'line_id' => 2
+            ],
+            [
+                'month'   => 'December',
+                'year'    => '2025',
+                'target'  => 88.0,
+                'actual'  => 84.6,
+                'line_id' => 2
+            ]
+        ];
+
+        foreach ($datas as $data) {
+            LinePerformance::create($data);
+        }
     }
 }

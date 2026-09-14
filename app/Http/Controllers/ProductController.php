@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 //import model
-use App\Models\ProductIn;
 use App\Models\ProductSummary;
 use App\Services\Production\SummaryService;
 
@@ -20,20 +19,24 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
+        //INPUT
         $search = $request->input('search');
 
-        $query = ProductSummary::with([
-            'firstProductIn:id,part_number,time_in',
-            'lastProductIn:id,product_out_id,part_number,time_in',
-            'lastProductIn.productOut:id,tag_id,part_number,time_out',
-        ]);
+        $query = ProductSummary::where('line_id', session('selected_line_id'))
+            ->with([
+                'firstProductIn:id,part_number,time_in',
+                'lastProductIn:id,product_out_id,part_number,time_in',
+                'lastProductIn.productOut:id,tag_id,part_number,time_out',
+            ])->orderBy('created_at', 'desc');
 
         if ($search) {
             $query->where('part_number', 'like', "%{$search}%");
         }
 
-        $products = $query->paginate(10)->withQueryString();
+        //PROCESS
+        $products = $query->paginate(10)->appends(request()->query());
 
+        //OUTPUT
         return view('products.index', compact('products'));
     }   
 

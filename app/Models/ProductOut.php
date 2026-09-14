@@ -14,7 +14,13 @@ class ProductOut extends Model
         'part_number',
         'time_out',
         'quantity',
+        'line_id',
     ];
+
+    public function line()
+    {
+        return $this->belongsTo(\App\Models\Line::class);
+    }
 
     public function productIns()
     {

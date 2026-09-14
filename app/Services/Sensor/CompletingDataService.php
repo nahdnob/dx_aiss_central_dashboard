@@ -2,6 +2,7 @@
 
 namespace App\Services\Sensor;
 
+use App\Models\Line;
 use App\Models\Pattern;
 use App\Models\SensorHistory;
 use App\Models\SensorSummary;
@@ -11,6 +12,7 @@ use App\Services\Sensor\SensorLimitService;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+
 class CompletingDataService
 {
     public function __construct(
@@ -24,40 +26,58 @@ class CompletingDataService
         $time = $now->format('H:i:s');
         $date = production_date($now);
 
-        $shift     = $this->context->currentShift($time);
-        $workHour  = $this->context->currentWorkHour($time);
-        $patternId = $this->context->currentPattern();
+        $shift    = $this->context->currentShift($time);
+        $workHour = $this->context->currentWorkHour($time);
 
-        if (!$shift || !$workHour || !$patternId) {
-            Log::warning('[SENSOR][SKIP_CONTEXT]', compact('shift','workHour','patternId'));
+        if (!$shift || !$workHour) {
+            Log::warning('[SENSOR][SKIP_CONTEXT]', compact('shift', 'workHour'));
+            return;
+        }
+
+        $hour = $this->context->shiftBoundary($shift);
+
+        foreach (Line::all() as $line) {
+            $this->processLine($line->id, $date, $hour, $workHour);
+        }
+    }
+
+    private function processLine(int $lineId, string $date, array $hour, int $workHour): void
+    {
+        $patternId = $this->context->currentPattern($lineId);
+
+        if (!$patternId) {
+            Log::warning('[SENSOR][SKIP_CONTEXT]', ['line_id' => $lineId, 'reason' => 'no_active_pattern']);
             return;
         }
 
         $limit = $this->limit->get($patternId);
-        $hour  = $this->context->shiftBoundary($shift);
 
-        $sensors = Pattern::findOrFail($patternId)->sensors;
+        $sensors = Pattern::findOrFail($patternId, ['*'])->sensors;
 
         foreach ($sensors as $sensor) {
 
             // 1️⃣ Sensor Summary
             $summaryId = SensorSummary::whereBetween(
                     'created_at',
-                    [$date.' '.$hour['first_start'], $date.' '.$hour['last_end']]
+                    [$date.' '.$hour['first_start'], $date.' '.$hour['last_end']],
+                    'and',
+                    false
                 )
                 ->where([
                     'work_hour_id' => $workHour,
                     'pattern_id'   => $patternId,
                     'sensor_id'    => $sensor->id,
+                    'line_id'      => $lineId,
                 ])
                 ->value('id');
 
             // 2️⃣ Ambil data belum diproses
-            $histories = SensorHistory::where('sensor_id', $sensor->id)
+            $histories = SensorHistory::where('sensor_id', '=', $sensor->id, 'and')
+                                      ->where('line_id', $lineId)
                                       ->whereBetween('time', [
                                           $date.' '.$hour['first_start'],
                                           $date.' '.$hour['last_end'],
-                                      ])
+                                      ], 'and', false)
                                       ->orderBy('time', 'asc')
                                       ->get();
 
@@ -83,7 +103,7 @@ class CompletingDataService
                     continue;
                 }
 
-                $duration = in_array($sensor->id, [1, 5])
+                $duration = $sensor->halve_duration
                     ? intdiv($diff, 2)
                     : $diff;
 
@@ -97,6 +117,7 @@ class CompletingDataService
                 ]);
 
                 Log::info('[SENSOR][UPDATED]', [
+                    'line_id'    => $lineId,
                     'sensor_id'  => $sensor->id,
                     'history_id' => $histories[$i]->id,
                     'duration'   => $duration,

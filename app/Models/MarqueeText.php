@@ -13,5 +13,5 @@ class MarqueeText extends Model
      *
      * @var array
      */
-    protected $fillable = ['text'];
+    protected $fillable = ['line_id', 'text'];
 }

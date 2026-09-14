@@ -11,11 +11,16 @@ class SensorSummary extends Model
         'work_hour_id',
         'pattern_id',
         'sensor_id',
+        'line_id',
         'summary',
         'average',
         'maximal',
         'minimal',
     ];
+
+    public function line(){
+        return $this->belongsTo(Line::class);
+    }
 
     // Relation to WorkHours - Many to One
     public function workHour(){

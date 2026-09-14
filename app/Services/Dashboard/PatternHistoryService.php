@@ -6,8 +6,8 @@ use App\Models\PatternHistory;
 
 class PatternHistoryService
 {
-    public function get(): PatternHistory|null
+    public function get(int $lineId): PatternHistory|null
     {
-        return PatternHistory::latest()->first();
+        return PatternHistory::where('line_id', $lineId)->latest()->first();
     }
 }

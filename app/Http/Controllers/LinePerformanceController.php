@@ -12,7 +12,8 @@ class LinePerformanceController extends Controller
 {
 	public static function index() {
 										
-		$linePerformances = LinePerformance::orderBy('year', 'desc')
+		$linePerformances = LinePerformance::where('line_id', session('selected_line_id'))
+										   ->orderBy('year', 'desc')
 										   ->orderByRaw("FIELD(month,'January','February','March','April','May','June', 'July','August','September','October','November','December') DESC")
 										   ->paginate(6);
 
@@ -24,7 +25,7 @@ class LinePerformanceController extends Controller
 		$q     = $request->q;
 		$group = $request->group;
 
-		$query = LinePerformance::query();
+		$query = LinePerformance::where('line_id', session('selected_line_id'));
 
 		if ($q) {
 			$query->where(function ($q2) use ($q) {
@@ -68,7 +69,8 @@ class LinePerformanceController extends Controller
 			'month'         => $request->input('line-performance-month'),
 			'year'          => $request->input('line-performance-year'),
 			'target'        => $targetValue,
-			'actual'        => $actualValue
+			'actual'        => $actualValue,
+			'line_id'       => session('selected_line_id'),
 		]);
 
 		//redirect to dashboard

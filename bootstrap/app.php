@@ -12,6 +12,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->redirectGuestsTo('/');
+        $middleware->alias([
+            'line.selected' => \App\Http\Middleware\EnsureLineSelected::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

@@ -2,6 +2,7 @@
 
 namespace App\Services\Sensor;
 
+use App\Models\Line;
 use App\Models\SensorSummary;
 use App\Models\SensorHistory;
 use App\Models\WorkHour;
@@ -17,24 +18,25 @@ class SensorSummaryService
     ) {}
 
     public function run(): void {
-        
+
         // Cek jam saat ini
         $now  = Carbon::now()->format('H:i:s');
 
         // Cek tanggal hari ini
         $date = now()->format('Y-m-d');
-        
+
         // Cek shift yang berjalan
         $shift = $this->context->currentShift($now);
 
         // Cek work hours yang berjalan
         $workHour = $this->context->currentWorkHour($now);
 
-        // Cek pattern yang berjalan
-        $pattern = $this->context->currentPattern();
-        
-        $first = WorkHour::where('shift_id', $shift)->orderBy('id', 'asc')->first();
-        $last  = WorkHour::where('shift_id', $shift)->orderBy('id', 'desc')->first();
+        if (!$shift || !$workHour) {
+            return;
+        }
+
+        $first = WorkHour::where('shift_id', '=', $shift, 'and')->orderBy('id', 'asc')->first();
+        $last  = WorkHour::where('shift_id', '=', $shift, 'and')->orderBy('id', 'desc')->first();
 
         $hour = [
             'first_id'   => $first->id,
@@ -44,24 +46,41 @@ class SensorSummaryService
             'last_start' => $last->time_start,
             'last_end'   => $last->time_end,
         ];
-        
-        $sensors = Pattern::find($pattern)->sensors;
-        
+
+        foreach (Line::all() as $line) {
+            $this->summarizeLine($line->id, $date, $hour, $workHour);
+        }
+    }
+
+    private function summarizeLine(int $lineId, string $date, array $hour, int $workHour): void
+    {
+        // Cek pattern yang berjalan untuk line ini
+        $pattern = $this->context->currentPattern($lineId);
+
+        if (!$pattern) {
+            return;
+        }
+
+        $sensors = Pattern::find($pattern, ['*'])->sensors;
+
         foreach ($sensors as $sensor) {
-            
-            $summary = SensorSummary::select('id','work_hour_id', 'pattern_id', 'sensor_id', 'average', 'maximal', 'minimal')
-                                    ->whereBetween('created_at', [$date . ' ' . $hour['first_start'], $date . ' ' . $hour['last_end']])
-                                    ->where('work_hour_id', $workHour)
-                                    ->where('pattern_id', $pattern)
-                                    ->where('sensor_id', $sensor->id)->first();
+
+            $summary = SensorSummary::select(['id','work_hour_id', 'pattern_id', 'sensor_id', 'line_id', 'average', 'maximal', 'minimal'])
+                                    ->whereBetween('created_at', [$date . ' ' . $hour['first_start'], $date . ' ' . $hour['last_end']], 'and', false)
+                                    ->where('work_hour_id', '=', $workHour, 'and')
+                                    ->where('pattern_id', '=', $pattern, 'and')
+                                    ->where('sensor_id', '=', $sensor->id, 'and')
+                                    ->where('line_id', '=', $lineId, 'and')
+                                    ->first();
 
             if (!$summary) {
-                
+
                 SensorSummary::create(
                     [
                         'work_hour_id' => $workHour,
                         'pattern_id'   => $pattern,
                         'sensor_id'    => $sensor->id,
+                        'line_id'      => $lineId,
                         'average'      => null,
                         'maximal'      => null,
                         'minimal'      => null
@@ -71,15 +90,15 @@ class SensorSummaryService
 
                 $summaryId = $summary->id;
 
-                $datas = SensorHistory::whereBetween('time', [$date . ' ' . $hour['first_start'], $date . ' ' . $hour['last_end']])
-                                      ->where('sensor_summary_id', $summaryId)
-                                      ->where('status', '=', 1)
+                $datas = SensorHistory::whereBetween('time', [$date . ' ' . $hour['first_start'], $date . ' ' . $hour['last_end']], 'and', false)
+                                      ->where('sensor_summary_id', '=', $summaryId, 'and')
+                                      ->where('status', '=', 1, 'and')
                                       ->pluck('duration');
-                
+
                 $dataAvg = $datas->avg();
                 $dataMax = $datas->max();
                 $dataMin = $datas->min();
-                
+
                 $summary->update([
                     'average'      => $dataAvg,
                     'maximal'      => $dataMax,

@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Collection;
 
 class PatternService
 {
-    public function get(): Collection
+    public function get(int $lineId): Collection
     {
-        return Pattern::all();
+        return Pattern::where('line_id', $lineId)->get();
     }
 }

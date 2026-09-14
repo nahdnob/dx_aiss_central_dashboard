@@ -1,7 +1,5 @@
-@if (count($products) > 0)
-
-
 <div class="relative overflow-x-auto sm:rounded-lg">
+@if (count($products) > 0)
     <table class="w-full text-sm text-left text-gray-500">
         <thead class="text-xs font-bold text-gray-800 uppercase bg-gray-50 border-b-2 border-gray-300">
             <tr>

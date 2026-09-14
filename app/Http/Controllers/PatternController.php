@@ -13,14 +13,42 @@ class PatternController extends Controller
      */
     public function index()
     {
-        $patterns = Pattern::with('sensors:id,name')->get();
-        $sensors  = Sensor::all();
+        $patterns = Pattern::where('line_id', session('selected_line_id'))->with('sensors:id,name')->get();
+        $sensors  = Sensor::where('line_id', session('selected_line_id'))->get();
  
         return view('cycletimes.setting.index', [
             'patterns' => $patterns,
             'sensors'  => $sensors
         ]);
     } 
+
+    /**
+     * Handle the upload of the sensor mapping image.
+     */
+    public function uploadMap(Request $request)
+    {
+        $request->validate([
+            'map_image' => 'required|image|mimes:jpeg,png,jpg,webp|max:5120',
+        ], [
+            'map_image.required' => 'File gambar tidak ditemukan.',
+            'map_image.image'    => 'File harus berupa gambar.',
+            'map_image.mimes'    => 'Format gambar harus berupa jpeg, png, jpg, atau webp.',
+            'map_image.max'      => 'Ukuran gambar maksimal 5MB.',
+        ]);
+
+        if ($request->hasFile('map_image')) {
+            
+            $file            = $request->file('map_image');
+            $destinationPath = public_path('img');
+            $fileName        = 'sensor-mapping.png';
+            
+            $file->move($destinationPath, $fileName);
+            
+            return back()->with('success', 'Sensor Map berhasil diperbarui.');
+        }
+
+        return back()->withErrors(['map_image' => 'Terjadi kesalahan saat mengunggah gambar.']);
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -68,6 +96,7 @@ class PatternController extends Controller
             'cycle_time' => $request->cycle_time,
             'max_time'   => $request->max_time,
             'min_time'   => $request->min_time,
+            'line_id'    => session('selected_line_id'),
         ]);
 
         // 3️⃣ Sinkronisasi pivot pattern_sensor dengan kolom tambahan 'pos'

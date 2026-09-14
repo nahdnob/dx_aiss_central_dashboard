@@ -9,7 +9,7 @@ function production_date(Carbon $now): string
             : $now->toDateString();
 }
 
-function calculate_duration(int $sensorId, string $t1, string $t2): int
+function calculate_duration(bool $halveDuration, string $t1, string $t2): int
 {
     $start = Carbon::parse($t1);
     $end   = Carbon::parse($t2);
@@ -20,6 +20,6 @@ function calculate_duration(int $sensorId, string $t1, string $t2): int
 
     $diff = $start->diffInSeconds($end);
 
-    return in_array($sensorId, [1,5]) ? intval($diff / 2) : $diff;
+    return $halveDuration ? intval($diff / 2) : $diff;
 }
 

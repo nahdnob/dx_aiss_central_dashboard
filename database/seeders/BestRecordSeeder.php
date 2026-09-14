@@ -14,6 +14,7 @@ class BestRecordSeeder extends Seeder
     public function run(): void
     {
         Ncd::create([
+            'line_id'=> 2,
             'date'   => '2020-04-24',
             'claim'  => 'dummy',
             'action' => 'dummy'

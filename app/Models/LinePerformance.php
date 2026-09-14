@@ -13,5 +13,10 @@ class LinePerformance extends Model
      *
      * @var array
      */
-    protected $fillable = ['month','year','target','actual',];
+    protected $fillable = ['month', 'year', 'target', 'actual', 'line_id'];
+
+    public function line()
+    {
+        return $this->belongsTo(\App\Models\Line::class);
+    }
 }

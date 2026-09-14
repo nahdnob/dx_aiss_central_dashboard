@@ -15,7 +15,8 @@ class MarqueeTextSeeder extends Seeder
     public function run(): void
     {
         MarqueeText::create([
-            'text' => 'Orang sabar pasti kesel. (H. Drs. Kasir Ibnu)',
+            'line_id' => 2,
+            'text'    => 'Orang sabar pasti kesel. (H. Drs. Kasir Ibnu)',
         ]);
     }
 }

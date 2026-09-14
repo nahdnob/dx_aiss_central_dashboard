@@ -13,6 +13,7 @@ class SensorHistory extends Model
         'sensor_summary_id',
         'pattern_id',
         'sensor_id',
+        'line_id',
         'time',
         'duration',
         'status'
@@ -26,5 +27,10 @@ class SensorHistory extends Model
     public function sensor()
     {
         return $this->belongsTo(Sensor::class);
+    }
+
+    public function line()
+    {
+        return $this->belongsTo(Line::class);
     }
 }

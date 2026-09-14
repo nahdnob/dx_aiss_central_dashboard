@@ -17,6 +17,10 @@ class PatternHistorySeeder extends Seeder
      */
     public function run(): void
     {
-        PatternHistory::create(['pattern_id' => 1,'created_at' => Carbon::now(),'updated_at' => Carbon::now()]);
+        // Pattern 1 belongs to Line 2 (seeded first in PatternSeeder)
+        PatternHistory::create([
+            'pattern_id' => 1,
+            'line_id'    => 2,
+        ]);
     }
 }

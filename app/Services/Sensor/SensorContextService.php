@@ -21,9 +21,9 @@ class SensorContextService
                        ->value('id');
     }
 
-    public function currentPattern(): ?int
+    public function currentPattern(int $lineId): ?int
     {
-        return PatternHistory::latest()->value('pattern_id');
+        return PatternHistory::where('line_id', $lineId)->latest()->value('pattern_id');
     }
 
     public function shiftBoundary(int $shift): array

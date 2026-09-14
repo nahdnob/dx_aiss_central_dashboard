@@ -4,29 +4,28 @@
 <div class="p-4 sm:ml-16 mt-14 transition-all duration-300">
     <div class="p-4 min-h-[calc(100vh-5rem)]">
         {{-- ===== HERO HEADER ===== --}}
-        <div class="relative bg-white rounded-2xl border border-gray-100 shadow-sm mb-6 overflow-hidden">
-            {{-- Decorative background --}}
-            <div class="absolute right-0 top-0 w-48 h-full bg-gradient-to-l from-red-50 to-transparent pointer-events-none"></div>
-            <div class="absolute right-8 top-1/2 -translate-y-1/2 w-24 h-24 rounded-full bg-red-100/40 pointer-events-none"></div>
-            <div class="relative flex items-center gap-5 px-6 py-5">
-                {{-- Icon --}}
-                <div class="shrink-0 w-14 h-14 rounded-xl bg-red-100 flex items-center justify-center">
-                    <svg class="w-7 h-7 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m7.171 12.906-2.153 6.411 2.672-.89 1.568 2.34 1.825-5.183m5.73-2.678 2.154 6.411-2.673-.89-1.568 2.34-1.825-5.183M9.165 4.3c.58.068 1.153-.17 1.515-.628a1.681 1.681 0 0 1 2.64 0 1.68 1.68 0 0 0 1.515.628 1.681 1.681 0 0 1 1.866 1.866c-.068.58.17 1.154.628 1.516a1.681 1.681 0 0 1 0 2.639 1.682 1.682 0 0 0-.628 1.515 1.681 1.681 0 0 1-1.866 1.866 1.681 1.681 0 0 0-1.516.628 1.681 1.681 0 0 1-2.639 0 1.681 1.681 0 0 0-1.515-.628 1.681 1.681 0 0 1-1.867-1.866 1.681 1.681 0 0 0-.627-1.515 1.681 1.681 0 0 1 0-2.64c.458-.361.696-.935.627-1.515A1.681 1.681 0 0 1 9.165 4.3ZM14 9a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z"/>
-                    </svg>
-                </div>
-                {{-- Text --}}
-                <div>
-                    <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Best Record</h1>
-                    <p class="mt-1 text-sm text-gray-500 max-w-lg leading-relaxed">
-                        This is the history of claims that have occurred on the
-                        <span class="font-semibold text-red-600">AISS production line</span>.
-                        Precision tracking ensures continuous improvement and technical accountability across all industrial operations.
-                    </p>
-                </div>
+        <div class="group relative bg-white rounded-2xl border border-gray-200 shadow-sm mb-6 overflow-hidden">
+            {{-- Trophy Image --}}
+            <div class="absolute left-0 top-0 h-full w-[420px] z-10">
+                <img src="{{ asset('assets/images/trophy.jpg') }}" alt="Best Record" class="w-full h-full object-cover">
+                {{-- Fade ke tengah --}}
+                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-white"></div>
             </div>
-            {{-- Left red bar accent --}}
-            <div class="absolute left-0 top-0 w-1 h-full bg-gradient-to-b from-red-500 to-rose-700 rounded-l-2xl"></div>
+            {{-- Decorative Right Background --}}
+            <div class="absolute right-0 top-0 w-64 h-full bg-gradient-to-l from-red-50 to-transparent z-20"></div>
+            {{-- Decorative Glow Circle --}}
+            <div class="absolute right-12 top-1/2 -translate-y-1/2 w-40 h-40 rounded-full bg-red-500/10 blur-3xl z-30"></div>
+            {{-- Decorative Small Circle --}}
+            <div class="absolute right-20 top-1/2 -translate-y-1/2 w-24 h-24 rounded-full bg-red-100/50 z-30"></div>
+            {{-- Content --}}
+            <div class="relative z-40 px-8 py-5 pl-[380px] min-h-[140px] flex flex-col justify-center">
+                <h1 class="text-2xl font-bold text-gray-900 tracking-tight">BEST RECORDS</h1>
+                <p class="mt-2 text-sm text-gray-500 leading-relaxed max-w-2xl">
+                    This is the history of claims that have occurred on the
+                    <span class="font-semibold text-red-600">AISS production line</span>.
+                    Precision tracking ensures continuous improvement and technical accountability across all industrial operations.
+                </p>
+            </div>
         </div>
         {{-- ===== OPERATIONS INPUT SECTION ===== --}}
         <div class="mb-6">
@@ -36,7 +35,7 @@
                 <h2 class="text-xl font-bold text-gray-900">New Claim Entry</h2>
             </div>
             {{-- Form --}}
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
                 <form action="{{ route('best-records.store') }}" method="POST">
                     @csrf
                     <div class="flex flex-col sm:flex-row gap-3 items-end">
@@ -49,7 +48,7 @@
                                 id="date"
                                 value="{{ old('date') }}"
                                 required
-                                class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent transition"
+                                class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent transition"
                             >
                         </div>
                         {{-- Claim Description --}}
@@ -62,7 +61,7 @@
                                 value="{{ old('claim') }}"
                                 placeholder="Specify technical issue..."
                                 required
-                                class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent transition"
+                                class="placeholder:text-zinc-300 w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent transition"
                             >
                         </div>
                         {{-- Action Taken --}}
@@ -75,32 +74,19 @@
                                 value="{{ old('action') }}"
                                 placeholder="Resolution status..."
                                 required
-                                class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent transition"
+                                class="placeholder:text-zinc-300 w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent transition"
                             >
                         </div>
                         {{-- Submit --}}
-                        <div class="shrink-0">
-                            <button
-                                type="submit"
-                                class="flex items-center gap-2 bg-gradient-to-r from-red-600 to-rose-700 hover:brightness-110 text-white font-bold text-sm px-5 py-2.5 rounded-lg shadow-sm shadow-red-200 transition-all duration-200 whitespace-nowrap"
-                            >
-                                SUBMIT RECORD
+                        <div class="shrink-0 w-full sm:w-auto">
+                            <button type="submit" class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:brightness-110 text-white font-bold text-sm px-5 py-2.5 rounded-lg shadow-sm transition-all duration-200 whitespace-nowrap uppercase">
+                                Submit Record
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
                                 </svg>
                             </button>
                         </div>
                     </div>
-
-                    @if($errors->any())
-                        <div class="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
-                            <ul class="list-disc list-inside space-y-1">
-                                @foreach($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
                 </form>
             </div>
         </div>
@@ -128,21 +114,48 @@
                 </div>
             </div>
             {{-- Table --}}
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                {{-- Search bar + Add Data --}}
+                <div class="p-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <form id="machine-search-form" method="GET" action="{{ route('best-records.index') }}" class="flex items-center gap-2 flex-1 max-w-lg">
+                        {{-- Search Input --}}
+                        <div class="relative flex-1">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m21 21-3.5-3.5M17 10a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                </svg>
+                            </div>
+                            <input type="search" id="search" name="search"
+                                   value="{{ request('search') }}"
+                                   placeholder="Search claim..."
+                                   class="placeholder:text-zinc-300 block w-full pl-9 pr-4 py-2.5 text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent transition"/>
+                        </div>
+                        {{-- Button Search --}}
+                        <button type="submit" class="px-4 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-sky-500 to-sky-600 rounded-xl hover:brightness-110 shadow-sm transition shrink-0 uppercase">
+                            Search
+                        </button>
+                        {{-- Button Reset --}}
+                        @if(request('search'))
+                            <a href="{{ route('best-records.index') }}" class="px-4 py-2.5 text-sm font-bold text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200 transition shrink-0 uppercase">
+                                Reset
+                            </a>
+                        @endif
+                    </form>
+                </div>
                 <table class="w-full text-sm text-left">
                     {{-- Table Header --}}
                     <thead>
-                        <tr class="border-b border-gray-100">
-                            <th class="px-5 py-3 text-[10px] font-bold tracking-widest text-gray-400 uppercase">Date</th>
-                            <th class="px-5 py-3 text-[10px] font-bold tracking-widest text-gray-400 uppercase">Claim</th>
-                            <th class="px-5 py-3 text-[10px] font-bold tracking-widest text-gray-400 uppercase">Action</th>
-                            <th class="px-5 py-3 text-[10px] font-bold tracking-widest text-gray-400 uppercase"></th>
+                        <tr class="bg-gray-50 border-b border-gray-150 text-center text-gray-500 font-bold text-[10px] tracking-widest uppercase">
+                            <th class="px-5 py-3">Date</th>
+                            <th class="px-5 py-3">Claim</th>
+                            <th class="px-5 py-3">Action</th>
+                            <th class="px-5 py-3"></th>
                         </tr>
                     </thead>
                     {{-- Table Body --}}
-                    <tbody class="divide-y divide-gray-50">
+                    <tbody class="divide-y divide-gray-100 bg-white">
                         @forelse ($ncds as $item)
-                            <tr class="hover:bg-red-50/40 transition-colors duration-150 group">
+                            <tr class="hover:bg-gray-50/50 transition-colors duration-150 group">
                                 {{-- Date + ID --}}
                                 <td class="px-5 py-4 whitespace-nowrap">
                                     <div class="font-semibold text-gray-800 text-sm">
@@ -151,27 +164,24 @@
                                     <div class="text-[11px] text-gray-400 mt-0.5">ID: REC-{{ str_pad($item->id, 4, '0', STR_PAD_LEFT) }}</div>
                                 </td>
                                 {{-- Claim --}}
-                                <td class="px-5 py-4 text-gray-600 max-w-xs">
+                                <td class="px-5 py-4 text-gray-600">
                                     {{ $item->claim }}
                                 </td>
                                 {{-- Action --}}
-                                <td class="px-5 py-4">
-                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-sky-100 text-sky-700">
-                                        {{ $item->action }}
-                                    </span>
+                                <td class="px-5 py-4 text-gray-600">
+                                    {{ $item->action }}
                                 </td>
                                 {{-- Edit/Delete --}}
                                 <td class="px-5 py-4">
                                     <div class="flex items-center justify-end gap-2">
                                         {{-- Edit / Delete (visible on hover) --}}
                                         <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-                                            <a
-                                                href="javascript:void(0)"
+                                            <a href="javascript:void(0)"
                                                 data-modal-open="edit-best-records-modal-{{ $item->id }}"
-                                                class="w-7 h-7 flex items-center justify-center rounded-lg bg-sky-100 text-sky-600 hover:bg-sky-200 transition text-xs font-bold"
+                                                class="w-8 h-8 flex items-center justify-center rounded-full bg-sky-500 text-white hover:bg-sky-600 transition shadow-sm"
                                                 title="Edit"
                                             >
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                                 </svg>
                                             </a>
@@ -182,9 +192,9 @@
                                                     type="submit"
                                                     onclick="return confirm('Hapus record ini?')"
                                                     title="Delete"
-                                                    class="w-7 h-7 flex items-center justify-center rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition"
+                                                    class="w-8 h-8 flex items-center justify-center rounded-full bg-red-500 text-white hover:bg-red-600 transition shadow-sm"
                                                 >
-                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                                     </svg>
                                                 </button>
@@ -200,7 +210,7 @@
                         @empty
                             {{-- Empty State --}}
                             <tr>
-                                <td colspan="4" class="px-5 py-12 text-center text-gray-400">
+                                <td colspan="4" class="px-5 py-12 text-center bg-white">
                                     <div class="flex flex-col items-center gap-2">
                                         <svg class="w-10 h-10 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
@@ -215,7 +225,7 @@
                 {{-- Table - Footer --}}
                 <div class="flex items-center justify-between px-5 py-3 border-t border-gray-100">
                     {{-- Pagination --}}
-                    <p class="text-xs text-red-500 font-medium">
+                    <p class="text-xs text-slate-400 font-medium">
                         Showing {{ $ncds->firstItem() ?? 0 }}–{{ $ncds->lastItem() ?? 0 }} of {{ $ncds->total() }} claims recorded
                     </p>
                     <div class="flex items-center gap-2">
@@ -231,12 +241,12 @@
                         {{-- Next --}}
                         @if ($ncds->hasMorePages())
                             <a href="{{ $ncds->nextPageUrl() }}"
-                               class="px-4 py-1.5 text-xs font-bold text-white bg-gradient-to-r from-red-600 to-rose-700 rounded-lg hover:brightness-110 shadow-sm shadow-red-200 transition">
+                               class="px-4 py-1.5 text-xs font-bold text-white bg-gradient-to-r from-sky-500 to-sky-600 rounded-lg hover:brightness-110 shadow-sm shadow-sky-200 transition">
                                 Next
                             </a>
                         {{-- Empty State --}}
                         @else
-                            <span class="px-4 py-1.5 text-xs font-bold text-white bg-red-300 rounded-lg cursor-not-allowed">Next</span>
+                            <span class="px-4 py-1.5 text-xs font-bold text-white bg-sky-300 rounded-lg cursor-not-allowed">Next</span>
                         @endif
                     </div>
                 </div>

@@ -10,8 +10,19 @@ class ShiftContext
 {
     public function get(Carbon $time): ?int {
         
-        return WorkHour::whereTime('start_time', '<=', $time->format('H:i:s'))
-                       ->whereTime('end_time', '>=', $time->format('H:i:s'))
-                       ->value('shift_id');
+        $currentTime = $time->format('H:i:s');
+
+        return WorkHour::all()->first(function ($workHour) use ($currentTime) {
+
+            if ($workHour->start_time <= $workHour->end_time) {
+                return $currentTime >= $workHour->start_time
+                    && $currentTime <= $workHour->end_time;
+            }
+
+            // shift melewati tengah malam
+            return $currentTime >= $workHour->start_time
+                || $currentTime <= $workHour->end_time;
+
+        })?->shift_id;
     }
 }

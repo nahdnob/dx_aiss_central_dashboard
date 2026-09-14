@@ -11,7 +11,13 @@ class Pattern extends Model
         'cycle_time',
         'max_time',
         'min_time',
+        'line_id',
     ];
+
+    public function line()
+    {
+        return $this->belongsTo(\App\Models\Line::class);
+    }
 
     // Relation to Sensors - Many to Many
     public function sensors(){

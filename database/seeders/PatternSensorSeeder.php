@@ -2,7 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Line;
+use App\Models\Pattern;
+use App\Models\Sensor;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -11,49 +13,55 @@ class PatternSensorSeeder extends Seeder
 {
     /**
      * Run the database seeds.
+     *
+     * Data-driven and per-line: pattern "NMP" attaches to that line's own
+     * sensors 1..N (by creation order), for every line that has the topology.
+     * Idempotent — skips a pattern that's already wired up.
      */
     public function run(): void
     {
         $now = Carbon::now();
 
-        DB::table('pattern_sensor')->insert([
-            ['pattern_id' => 1, 'sensor_id' => 1, 'pos' => 1, 'created_at' => $now, 'updated_at' => $now],
-            ['pattern_id' => 1, 'sensor_id' => 2, 'pos' => 2, 'created_at' => $now, 'updated_at' => $now],
-            ['pattern_id' => 1, 'sensor_id' => 3, 'pos' => 3, 'created_at' => $now, 'updated_at' => $now],
-        ]);
+        $pointsByPatternName = [
+            '3MP' => 3,
+            '4MP' => 4,
+            '5MP' => 5,
+            '6MP' => 6,
+            '7MP' => 7,
+        ];
 
-        DB::table('pattern_sensor')->insert([
-            ['pattern_id' => 2, 'sensor_id' => 1, 'pos' => 1, 'created_at' => $now, 'updated_at' => $now],
-            ['pattern_id' => 2, 'sensor_id' => 2, 'pos' => 2, 'created_at' => $now, 'updated_at' => $now],
-            ['pattern_id' => 2, 'sensor_id' => 3, 'pos' => 3, 'created_at' => $now, 'updated_at' => $now],
-            ['pattern_id' => 2, 'sensor_id' => 4, 'pos' => 4, 'created_at' => $now, 'updated_at' => $now],
-        ]);
+        foreach (Line::pluck('id') as $lineId) {
 
-        DB::table('pattern_sensor')->insert([
-            ['pattern_id' => 3, 'sensor_id' => 1, 'pos' => 1, 'created_at' => $now, 'updated_at' => $now],
-            ['pattern_id' => 3, 'sensor_id' => 2, 'pos' => 2, 'created_at' => $now, 'updated_at' => $now],
-            ['pattern_id' => 3, 'sensor_id' => 3, 'pos' => 3, 'created_at' => $now, 'updated_at' => $now],
-            ['pattern_id' => 3, 'sensor_id' => 4, 'pos' => 4, 'created_at' => $now, 'updated_at' => $now],
-            ['pattern_id' => 3, 'sensor_id' => 5, 'pos' => 5, 'created_at' => $now, 'updated_at' => $now],
-        ]);
+            $sensorIds = Sensor::where('line_id', $lineId)->orderBy('id')->pluck('id')->values();
 
-        DB::table('pattern_sensor')->insert([
-            ['pattern_id' => 4, 'sensor_id' => 1, 'pos' => 1, 'created_at' => $now, 'updated_at' => $now],
-            ['pattern_id' => 4, 'sensor_id' => 2, 'pos' => 2, 'created_at' => $now, 'updated_at' => $now],
-            ['pattern_id' => 4, 'sensor_id' => 3, 'pos' => 3, 'created_at' => $now, 'updated_at' => $now],
-            ['pattern_id' => 4, 'sensor_id' => 4, 'pos' => 4, 'created_at' => $now, 'updated_at' => $now],
-            ['pattern_id' => 4, 'sensor_id' => 5, 'pos' => 5, 'created_at' => $now, 'updated_at' => $now],
-            ['pattern_id' => 4, 'sensor_id' => 6, 'pos' => 6, 'created_at' => $now, 'updated_at' => $now],
-        ]);
+            foreach (Pattern::where('line_id', $lineId)->get(['id', 'name']) as $pattern) {
 
-        DB::table('pattern_sensor')->insert([
-            ['pattern_id' => 5, 'sensor_id' => 1, 'pos' => 1, 'created_at' => $now, 'updated_at' => $now],
-            ['pattern_id' => 5, 'sensor_id' => 2, 'pos' => 2, 'created_at' => $now, 'updated_at' => $now],
-            ['pattern_id' => 5, 'sensor_id' => 3, 'pos' => 3, 'created_at' => $now, 'updated_at' => $now],
-            ['pattern_id' => 5, 'sensor_id' => 4, 'pos' => 4, 'created_at' => $now, 'updated_at' => $now],
-            ['pattern_id' => 5, 'sensor_id' => 5, 'pos' => 5, 'created_at' => $now, 'updated_at' => $now],
-            ['pattern_id' => 5, 'sensor_id' => 6, 'pos' => 6, 'created_at' => $now, 'updated_at' => $now],
-            ['pattern_id' => 5, 'sensor_id' => 7, 'pos' => 7, 'created_at' => $now, 'updated_at' => $now],
-        ]);
+                if (DB::table('pattern_sensor')->where('pattern_id', $pattern->id)->exists()) {
+                    continue;
+                }
+
+                $points = $pointsByPatternName[$pattern->name] ?? 0;
+                $rows   = [];
+
+                for ($pos = 1; $pos <= $points; $pos++) {
+
+                    if (!isset($sensorIds[$pos - 1])) {
+                        break;
+                    }
+
+                    $rows[] = [
+                        'pattern_id' => $pattern->id,
+                        'sensor_id'  => $sensorIds[$pos - 1],
+                        'pos'        => $pos,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
+                }
+
+                if ($rows) {
+                    DB::table('pattern_sensor')->insert($rows);
+                }
+            }
+        }
     }
 }

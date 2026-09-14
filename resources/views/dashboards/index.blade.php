@@ -18,20 +18,18 @@
 						:last-day="$best_record['last_day']"
 					/>
 				</div>
-				<!-- Modal Line Performance - Edit -->
+				<!-- Line Performance -->
 				<div class="mt-4 w-full flex flex-col">
 					<x-dashboard.line-performance
 						:items="$linePerformances"
 					/>
 				</div>
 			</div>
-
 			{{-- Carousel Panel --}}
 			<div class="w-full">
 				@auth
 				<div class="h-[515px] bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-100 flex flex-col">
-
-					{{-- Carousel Header (hanya tampil jika login) --}}
+					{{-- Carousel Header --}}
 					<div class="flex items-center justify-between px-4 py-2.5 bg-sky-200 shrink-0">
 						{{-- Slide Tabs --}}
 						<div class="flex gap-2" id="carousel-tabs">
@@ -74,19 +72,17 @@
 				{{-- Guest: no header, blue top border --}}
 				<div class="h-[515px] bg-white shadow-xl rounded-2xl overflow-hidden border-t-4 border-t-sky-200 border border-gray-100 flex flex-col">
 				@endauth
-
 					{{-- Slides Wrapper --}}
 					<div class="relative flex-1 overflow-hidden" id="carousel-slides-wrapper">
-
 						{{-- Slide 0: Data Table --}}
 						<div class="carousel-slide absolute inset-0 transition-all duration-500 ease-in-out opacity-100 translate-x-0 h-full overflow-auto p-3" data-slide="0">
 							@include('dashboards.partials.product-table', ['products' => $products])
 						</div>
-
 						{{-- Slide 1: Cycle Time Chart --}}
 						<div class="carousel-slide absolute inset-0 transition-all duration-500 ease-in-out opacity-0 translate-x-full h-full overflow-auto p-3" data-slide="1">
 							<form id="pattern-form" method="POST" action="{{ route('pattern-histories.store') }}" class="flex gap-3 items-center flex-wrap mb-3">
 								@csrf
+								<input type="hidden" name="line_id" value="{{ $dashboardLineId }}">
 								<select name="pattern" class="bg-gray-50 border border-gray-300 text-gray-700 font-semibold text-sm rounded-lg focus:ring-sky-400 focus:border-sky-400 block p-2.5 transition">
 									@foreach ($patterns as $pattern)
 										<option value="{{ $pattern->id }}" {{ $patternId == $pattern->id ? 'selected' : '' }}>
@@ -96,16 +92,14 @@
 								</select>
 								<button type="submit" class="bg-gradient-to-r from-red-600 to-rose-900 text-white font-bold text-sm px-5 py-2.5 rounded-lg hover:brightness-110 transition shadow-sm shadow-red-300">APPLY</button>
 							</form>
-							<div class="bg-gray-50 rounded-xl p-3 h-[400px]">
+							<div class="bg-gray-50 rounded-xl p-3 h-[430px]">
 								<canvas id="chart_main"></canvas>
 							</div>
 						</div>
-
 					</div>
 				</div>
 				</div> {{-- end .h-[515px] --}}
 			</div>
-
 			{{-- Custom Carousel JS --}}
 			<script>
 				(function() {
@@ -158,6 +152,12 @@
 							dot.classList.add('bg-sky-300', 'w-2');
 						}
 					});
+
+					if (index === 1 && typeof chart_main !== 'undefined' && chart_main) {
+						setTimeout(() => {
+							chart_main.resize();
+						}, 500);
+					}
 				};
 
 				document.getElementById('carousel-prev-btn')?.addEventListener('click', () => {
@@ -200,6 +200,7 @@
 			})();
 			</script>
 		</div>
+
 		<footer class="relative">
 			<div class="container mx-auto px-4 pt-1">
 				<div class="flex flex-wrap items-center md:justify-between justify-center">
@@ -229,15 +230,24 @@
 					:image="Auth::user()->image ? asset('storage/' . Auth::user()->image) : asset('assets/images/profile-blank.jpg')"
 				/>
 			</x-ui.modal>
+
+			@if(!$selectedLineId)
+				<x-line-select-modal :lines="$lines" />
+
+				<script>
+					document.addEventListener('DOMContentLoaded', function () {
+						window.Modal?.open('line-select-modal');
+					});
+				</script>
+			@endif
 		@endauth
 		<x-ui.modal id="login-modal" maxWidth="max-w-3xl">
 			<x-auth.login-form />
 		</x-ui.modal>
-	</div>
 	<script src="https://cdn.jsdelivr.net/npm/@tailwindplus/elements@1" type="module"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.4.0/dist/chartjs-plugin-annotation.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 	<script src="https://unpkg.com/flowbite@latest/dist/flowbite.min.js"></script>
 
 	<script> // Main Chart
@@ -254,10 +264,10 @@
 		const maxY         = {{ $cycleTimeData['maxY'] ?? 100 }};
 
 		const bgColors = dataAverage.map(v =>
-			v > tactTime ? 'rgba(239,68,68,0.5)' : 'rgba(74,222,128,0.5)'
+			v > tactTime ? 'rgba(239, 68, 68, 0.5)' : 'rgba(14, 165, 233, 0.5)'
 		);
 		const bdColors = dataAverage.map(v =>
-			v > tactTime ? 'rgba(239,68,68,1)' : 'rgba(22,163,74,0.5)'
+			v > tactTime ? 'rgba(239, 68, 68, 1)' : 'rgba(14, 165, 233, 1)'
 		);
 
 		// annotation
@@ -281,8 +291,8 @@
         function renderParetoChart(data) {
             if (!chart_main) return;
 
-            const bgColors = data.mainAverages.map(v => v > data.tactTime ? 'rgba(239, 68, 68, 0.5)' : 'rgba(74, 222, 128, 0.5)');
-            const bdColors = data.mainAverages.map(v => v > data.tactTime ? 'rgba(239, 68, 68, 1)' : 'rgba(22, 163, 74, 0.5)');
+            const bgColors = data.mainAverages.map(v => v > data.tactTime ? 'rgba(239, 68, 68, 0.5)' : 'rgba(14, 165, 233, 0.5)');
+            const bdColors = data.mainAverages.map(v => v > data.tactTime ? 'rgba(239, 68, 68, 1)' : 'rgba(14, 165, 233, 1)');
 
             chart_main.data.labels                      = data.mainLabels.map((name, index) => 'POS ' + (index + 1));
             chart_main.data.datasets[0].data            = data.mainAverages.map(v => parseFloat(v).toFixed(1));
@@ -300,11 +310,12 @@
 				data: {
 					labels: paretoLabels.map((_, i) => 'POS ' + (i + 1)),
 					datasets: [{
-						label: 'Cycle Time (second)',
+						label: 'Time (s)',
 						data: dataAverage,
 						backgroundColor: bgColors,
 						borderColor: bdColors,
-						borderWidth: 3
+						borderWidth: 2,
+						borderRadius: 4
 					}]
 				},
 				options: {
@@ -314,7 +325,7 @@
 						x: {
                             ticks: {
                                 font: {
-                                    size: 12,
+                                    size: 16,
                                     weight: 'normal'
                                 },
                                 color: '#000'
@@ -322,7 +333,7 @@
                         },
 						y: {
 							beginAtZero: true,
-							max: dataMax.length > 0 ? (Math.max(...dataMax) + 5) : maxY,
+							max: dataMax.length > 0 ? (Math.max(...dataMax)) : maxY,
 							title: {
                                 display: true,
                                 text: 'Second',
@@ -332,39 +343,49 @@
 						}
 					},
 					plugins: {
+						legend: { display: true },
+						tooltip: {
+							backgroundColor: '#111827',
+							padding: 10,
+							titleFont: { size: 12 },
+							bodyFont: { size: 12, weight: 'bold' },
+							displayColors: false,
+							callbacks: {
+								label: function(item) {
+									return ` Avg: ${item.parsed.y}s`;
+								}
+							}
+						},
 						datalabels: {
-                            anchor: 'center',
-                            align: 'center',
-                            color: '#000',
-                            font: {
-                                size: 12,
-                                weight: 'normal'
-                            },
-                            formatter: function(value) {
-                                return value + 's';
-                            }
-                        },
+							display: true,
+							color: '#000',
+							font: { weight: 'bold', size: 16 },
+						},
 						annotation: {
 							annotations: {
 								tactLine: {
 									type: 'line',
-									xMin: -0.5,
-									xMax: dataAverage.length - 0.5,
 									yMin: tactTime,
 									yMax: tactTime,
-									borderColor: 'rgba(255,99,132,1)',
+									borderColor: 'rgba(239, 68, 68, 1)',
 									borderWidth: 2,
+									borderDash: [6, 4],
 									label: {
-										enabled: false,
-										content: 'Standard Limit : ' + tactTime + 's'
+										display: true,
+										content: 'SCL : ' + tactTime + 's',
+										position: 'end',
+										backgroundColor: 'rgba(239,68,68,0.85)',
+										color: '#fff',
+										font: { size: 10, weight: 'bold' },
+										padding: { x: 8, y: 4 },
+										borderRadius: 6
 									}
 								},
 								...verticalAnnotations
 							}
 						}
 					}
-				},
-				plugins: [ChartDataLabels]
+				}
 			});
 		}
 

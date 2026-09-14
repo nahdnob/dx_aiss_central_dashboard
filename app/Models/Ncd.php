@@ -13,5 +13,10 @@ class Ncd extends Model
      *
      * @var array
      */
-    protected $fillable = ['date','claim','action',];
+    protected $fillable = ['date', 'claim', 'action', 'line_id'];
+
+    public function line()
+    {
+        return $this->belongsTo(\App\Models\Line::class);
+    }
 }

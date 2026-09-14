@@ -16,6 +16,7 @@ class Shift extends Model
         'time_start',
         'time_end',
         'description',
+        'line_id',
     ];
 
     public function workHours()

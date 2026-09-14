@@ -2,11 +2,13 @@
 
 namespace App\Services\Production;
 
+use App\Models\Line;
 use App\Models\ProductOut;
 use App\Models\ProductIn;
 use App\Models\Shift;
 
 use App\Services\Production\FifoService;
+use App\Services\Production\SummaryService;
 
 use Carbon\Carbon;
 
@@ -16,7 +18,8 @@ use Illuminate\Support\Facades\Cache;
 class ProductOutService
 {
     public function __construct(
-        private FifoService $fifoService
+        private FifoService $fifoService,
+        private SummaryService $summaryService
     ) {}
 
     public function sync(): int {
@@ -29,87 +32,12 @@ class ProductOutService
         }
 
         try {
+
             $count = 0;
 
-            Log::info('[PRODUCT-OUT][SYNC_START]');
-
-            $today    = now();
-            $now      = $today->format('H:i:s');
-            $lastData = ProductOut::latest()->first();
-
-            if ($lastData === null) {
-
-                $shiftId  = $this->getShiftId($now);
-                $filePath = $this->setFilePath($today, $now, $shiftId);
-
-                if (!$filePath) {
-                    Log::warning('[PRODUCT-OUT][FILE_PATH_NULL]', [
-                        'shift_id' => $shiftId,
-                        'time'     => $now
-                    ]);
-                    return 0;
-                }
-
-                $count += $this->processFile($today, $filePath);
-
-                Log::info('[PRODUCT-OUT][SYNC_END]', [
-                    'processed' => $count,
-                    'mode'      => 'initial'
-                ]);
-
-                return $count;
+            foreach (Line::whereNotNull('kanban_path')->get() as $line) {
+                $count += $this->syncLine($line);
             }
-
-            $lastDate = Carbon::parse($lastData->time_out)->toDateString();
-            $nowDate  = $today->toDateString();
-
-            if ($lastDate !== $nowDate) {
-
-                $count += $this->calibrate($lastData, $lastDate, $nowDate);
-
-                Log::info('[PRODUCT-OUT][SYNC_END]', [
-                    'processed' => $count,
-                    'mode'      => 'calibration'
-                ]);
-
-                return $count;
-            }
-
-            $shiftId  = $this->getShiftId($now);
-            $filePath = $this->setFilePath($today, $now, $shiftId);
-
-            if (!$filePath) {
-                Log::warning('[PRODUCT-OUT][FILE_PATH_NULL]', [
-                    'shift_id' => $shiftId,
-                    'time'     => $now
-                ]);
-                return 0;
-            }
-
-            try {
-
-                $data = file($filePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-
-            } catch (\Throwable $e) {
-
-                Log::error($e->getMessage());
-                return 0;
-            }
-
-            $lastIndex = collect($data)->search(
-                fn ($line) => str_contains($line, $lastData->tag_id)
-            );
-
-            if ($lastIndex === false || $lastIndex === array_key_last($data)) {
-                Log::info('[PRODUCT-OUT][NO_NEW_DATA]');
-                return 0;
-            }
-
-            $count += $this->processFile($today, $filePath, $lastIndex + 1);
-
-            Log::info('[PRODUCT-OUT][SYNC_END]', [
-                'processed' => $count
-            ]);
 
             return $count;
 
@@ -118,42 +46,133 @@ class ProductOutService
             $lock->release();
         }
     }
-    
-    private function setFilePath($today, string $now, int $shiftId): ?string
+
+    private function syncLine(Line $line): int {
+
+        Log::info('[PRODUCT-OUT][SYNC_START]', ['line_id' => $line->id]);
+
+        $today    = now();
+        $now      = $today->format('H:i:s');
+        $lastData = ProductOut::where('line_id', $line->id)->latest()->first();
+
+        if ($lastData === null) {
+
+            $shiftId  = $this->getShiftId($now);
+            $filePath = $this->setFilePath($line, $today, $now, $shiftId);
+
+            if (!$filePath) {
+                Log::warning('[PRODUCT-OUT][FILE_PATH_NULL]', [
+                    'line_id'  => $line->id,
+                    'shift_id' => $shiftId,
+                    'time'     => $now
+                ]);
+                return 0;
+            }
+
+            $count = $this->processFile($line, $today, $filePath);
+
+            Log::info('[PRODUCT-OUT][SYNC_END]', [
+                'line_id'   => $line->id,
+                'processed' => $count,
+                'mode'      => 'initial'
+            ]);
+
+            return $count;
+        }
+
+        $lastDate = Carbon::parse($lastData->time_out)->toDateString();
+        $nowDate  = $today->toDateString();
+
+        if ($lastDate !== $nowDate) {
+
+            $count = $this->calibrate($line, $lastData, $lastDate, $nowDate);
+
+            Log::info('[PRODUCT-OUT][SYNC_END]', [
+                'line_id'   => $line->id,
+                'processed' => $count,
+                'mode'      => 'calibration'
+            ]);
+
+            return $count;
+        }
+
+        $shiftId  = $this->getShiftId($now);
+        $filePath = $this->setFilePath($line, $today, $now, $shiftId);
+
+        if (!$filePath) {
+            Log::warning('[PRODUCT-OUT][FILE_PATH_NULL]', [
+                'line_id'  => $line->id,
+                'shift_id' => $shiftId,
+                'time'     => $now
+            ]);
+            return 0;
+        }
+
+        try {
+
+            $data = file($filePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+
+        } catch (\Throwable $e) {
+
+            Log::error($e->getMessage());
+            return 0;
+        }
+
+        $lastIndex = collect($data)->search(
+            fn ($row) => str_contains($row, $lastData->tag_id)
+        );
+
+        if ($lastIndex === false || $lastIndex === array_key_last($data)) {
+            Log::info('[PRODUCT-OUT][NO_NEW_DATA]', ['line_id' => $line->id]);
+            return 0;
+        }
+
+        $count = $this->processFile($line, $today, $filePath, $lastIndex + 1);
+
+        Log::info('[PRODUCT-OUT][SYNC_END]', [
+            'line_id'   => $line->id,
+            'processed' => $count
+        ]);
+
+        return $count;
+    }
+
+    private function setFilePath(Line $line, $today, string $now, int $shiftId): ?string
     {
         if ($shiftId === 1) {
 
-            return $this->getFilePath($today, 'DAY');
+            return $this->getFilePath($line, $today, 'DAY');
         }
 
         if ($shiftId === 2) {
 
             if ($now >= '20:00:00') {
-                return $this->getFilePath($today, 'NIGHT');
+                return $this->getFilePath($line, $today, 'NIGHT');
             }
 
             if ($now < '07:30:00') {
-                return $this->getFilePath($today->copy()->subDay(), 'NIGHT');
+                return $this->getFilePath($line, $today->copy()->subDay(), 'NIGHT');
             }
         }
         return null;
     }
 
-    private function getFilePath($date, string $shift): string {
+    private function getFilePath(Line $line, $date, string $shift): string {
 
-        return '\\\\192.168.2.1\\Users\\User\\Documents\\IGS\\'
+        return $line->kanban_path . '\\'
                 . $date->year . '\\'
                 . $date->month . '\\'
                 . $date->format('d') . '\\'
                 . $shift . '\\KANBAN DATA\\Data.txt';
     }
 
-    private function processFile($currentDate, string $filePath, int $startIndex = 0): int {
+    private function processFile(Line $line, $currentDate, string $filePath, int $startIndex = 0): int {
 
         if (!file_exists($filePath)) {
 
             Log::warning('[PRODUCT-OUT][FILE_NOT_FOUND]', [
-                'path' => $filePath
+                'line_id' => $line->id,
+                'path'    => $filePath
             ]);
 
             return 0;
@@ -165,6 +184,7 @@ class ProductOutService
         } catch (\Throwable $e) {
 
             Log::error('[PRODUCT-OUT][READ_FILE_ERROR]', [
+                'line_id' => $line->id,
                 'message' => $e->getMessage()
             ]);
 
@@ -172,6 +192,7 @@ class ProductOutService
         }
 
         $count = 0;
+        $updatedParts = [];
 
         for ($i = $startIndex; $i < count($data); $i++) {
 
@@ -183,15 +204,21 @@ class ProductOutService
 
             if ($parsed['judgement'] === 'OK') {
 
-                if ($this->save($currentDate, $parsed)) {
+                if ($this->save($line, $currentDate, $parsed)) {
                     $count++;
+                    $updatedParts[] = $parsed['partNumber'];
                 }
             }
         }
 
+        // update summary hanya sekali per part_number
+        foreach (array_unique($updatedParts) as $partNumber) {
+            $this->summaryService->updateSummary($line->id, $partNumber);
+        }
+
         return $count;
     }
-    
+
     private function parseLine(string $line): ?array {
 
         $cols = preg_split('/[\t\s]+/', trim($line));
@@ -211,7 +238,7 @@ class ProductOutService
         ];
     }
 
-    private function save($currentDate, array $parsed): bool
+    private function save(Line $line, $currentDate, array $parsed): bool
     {
         if (empty($parsed['tagId']) || empty($parsed['partNumber']) || empty($parsed['timeOut'])) {
             return false;
@@ -236,6 +263,7 @@ class ProductOutService
                 'part_number' => $parsed['partNumber'],
                 'time_out'    => $dateTimeOut,
                 'quantity'    => (int) $parsed['quantity'],
+                'line_id'     => $line->id,
             ]
         );
 
@@ -248,8 +276,8 @@ class ProductOutService
 
         return true;
     }
-    
-    private function calibrate($lastData, string $lastDate, string $nowDate): int {
+
+    private function calibrate(Line $line, $lastData, string $lastDate, string $nowDate): int {
 
         $count = 0;
 
@@ -261,7 +289,7 @@ class ProductOutService
 
             foreach ($shifts as $shift) {
 
-                $filePath = $this->getFilePath($currentDate, $shift);
+                $filePath = $this->getFilePath($line, $currentDate, $shift);
 
                 if (!file_exists($filePath)) {
                     continue;
@@ -274,13 +302,13 @@ class ProductOutService
                     $data = file($filePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 
                     $foundIndex = collect($data)->search(
-                        fn ($line) => str_contains($line, $lastData->tag_id)
+                        fn ($row) => str_contains($row, $lastData->tag_id)
                     );
 
                     $startIndex = ($foundIndex !== false) ? $foundIndex + 1 : 0;
                 }
 
-                $count += $this->processFile($currentDate, $filePath, $startIndex);
+                $count += $this->processFile($line, $currentDate, $filePath, $startIndex);
             }
 
             $currentDate->addDay();
@@ -289,13 +317,13 @@ class ProductOutService
         return $count;
     }
 
-    
+
     private function getShiftId(string $time): ?int {
 
         return Shift::where(function ($q) use ($time) {
 
-            $q->where('time_start', '<=', $time)->where('time_end', '>', $time);
+            $q->where('time_start', '<=', $time, 'and')->where('time_end', '>', $time, 'and');
 
-        })->value('id');
+        }, null, null, 'and')->value('id');
     }
 }

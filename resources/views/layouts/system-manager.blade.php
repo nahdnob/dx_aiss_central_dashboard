@@ -9,6 +9,8 @@
 <body>
     <x-ui.navbar-2 />
 
+    <x-ui.toast />
+
     <x-ui.sidebar />
     
     <main>
@@ -32,19 +34,4 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@tailwindplus/elements@1" type="module"></script>
 </body>
-@if(session('success'))
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            Toast.show(@json(session('success')), 'success');
-        });
-    </script>
-@endif
-
-@if(session('error'))
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            Toast.show(@json(session('error')), 'error');
-        });
-    </script>
-@endif
 </html>

@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 
 use Illuminate\View\View;
 
+use App\Models\Line;
 use App\Models\User;
 
 class AuthController extends Controller
@@ -44,19 +45,44 @@ class AuthController extends Controller
             ->with('success', 'Registrasi berhasil, selamat datang!');
     }
 
+    public function showLoginForm()
+    {
+        if (Auth::check()) {
+            return redirect()->route(session('selected_line_id') ? 'system-managers.index' : 'dashboards.index');
+        }
+
+        $lines = Line::orderBy('name')->get();
+
+        return view('auth.login', compact('lines'));
+    }
+
     public function login(Request $request) {
-        
+
         $credentials = $request->validate([
             'npk'      => 'required',
             'password' => 'required'
         ]);
 
-        if (Auth::attempt($credentials)) {
+        if (Auth::attempt($credentials, $request->boolean('remember'))) {
 
             $request->session()->regenerate();
 
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success'    => true,
+                    'csrf_token' => csrf_token(),
+                ]);
+            }
+
             return redirect()->route('dashboards.index')
                 ->with('success', 'Login berhasil!');
+        }
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'NPK atau password salah',
+            ], 401);
         }
 
         return back()

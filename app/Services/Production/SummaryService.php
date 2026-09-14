@@ -7,9 +7,10 @@ use App\Models\ProductSummary;
 
 class SummaryService
 {
-    public function updateSummary(string $partNumber): void
+    public function updateSummary(int $lineId, string $partNumber): void
     {
         $data = ProductIn::where('part_number', $partNumber)
+            ->where('line_id', $lineId)
             ->selectRaw('
                 MIN(id) as first_id,
                 MAX(id) as last_id,
@@ -18,13 +19,17 @@ class SummaryService
             ')
             ->first();
 
+        if (!$data || !$data->first_id) {
+            return;
+        }
+
         ProductSummary::updateOrCreate(
-            ['part_number' => $partNumber],
+            ['line_id' => $lineId,'part_number' => $partNumber],
             [
                 'first_id' => $data->first_id,
                 'last_id'  => $data->last_id,
-                'qty_in'   => $data->qty_in,
-                'qty_out'  => $data->qty_out,
+                'qty_in'   => $data->qty_in ?? 0,
+                'qty_out'  => $data->qty_out ?? 0,
             ]
         );
     }

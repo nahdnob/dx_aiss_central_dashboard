@@ -4,34 +4,32 @@
 <div class="p-4 sm:ml-16 mt-14 transition-all duration-300">
     <div class="p-4 min-h-[calc(100vh-5rem)]">
         {{-- ===== HERO HEADER ===== --}}
-        <div class="relative bg-white rounded-2xl border border-gray-100 shadow-sm mb-6 overflow-hidden">
-            {{-- Decorative background --}}
-            <div class="absolute right-0 top-0 w-48 h-full bg-gradient-to-l from-red-50 to-transparent pointer-events-none"></div>
-            <div class="absolute right-8 top-1/2 -translate-y-1/2 w-24 h-24 rounded-full bg-red-100/40 pointer-events-none"></div>
-            <div class="relative flex items-center gap-5 px-6 py-5">
-                {{-- Icon --}}
-                <div class="shrink-0 w-14 h-14 rounded-xl bg-red-100 flex items-center justify-center">
-                    <svg class="w-7 h-7 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 10V6a3 3 0 013-3h0a3 3 0 013 3v4m3-2l.917 11.923A1 1 0 0117.92 21H6.08a1 1 0 01-.997-1.077L6 8h12z"/>
-                    </svg>
-                </div>
-                {{-- Title and Description --}}
-                <div>
-                    <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Production</h1>
-                    <p class="mt-1 text-sm text-gray-500 max-w-lg leading-relaxed">
-                        Real-time monitoring of product flow on the
-                        <span class="font-semibold text-red-600">AISS production line</span>.
-                        Track part numbers, quantities, and timestamps across all input/output points.
-                    </p>
-                </div>
+        <div class="group relative bg-white rounded-2xl border border-gray-200 shadow-sm mb-6 overflow-hidden">
+            {{-- Production Image --}}
+            <div class="absolute left-0 top-0 h-full w-[420px] z-10">
+                <img src="{{ asset('assets/images/production.jpg') }}" alt="Production" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-white"></div>
             </div>
-            <div class="absolute left-0 top-0 w-1 h-full bg-gradient-to-b from-red-500 to-rose-700 rounded-l-2xl"></div>
+            {{-- Decorative Right Background --}}
+            <div class="absolute right-0 top-0 w-64 h-full bg-gradient-to-l from-red-50 to-transparent z-20"></div>
+            {{-- Decorative Glow Circle --}}
+            <div class="absolute right-12 top-1/2 -translate-y-1/2 w-40 h-40 rounded-full bg-red-500/10 blur-3xl z-30"></div>
+            {{-- Decorative Small Circle --}}
+            <div class="absolute right-20 top-1/2 -translate-y-1/2 w-24 h-24 rounded-full bg-red-100/50 z-30"></div>
+            {{-- Content --}}
+            <div class="relative z-40 px-8 py-5 pl-[380px] min-h-[140px] flex flex-col justify-center">
+                <h1 class="text-2xl font-bold text-gray-900 tracking-tight">PRODUCTION</h1>
+                <p class="mt-2 text-sm text-gray-500 leading-relaxed max-w-2xl">
+                    Real-time monitoring of product flow on the
+                    <span class="font-semibold text-red-600">AISS production line</span>.
+                    Track part numbers, quantities, and timestamps across all input/output points.
+                </p>
+            </div>
         </div>
         {{-- ===== SUMMARY CARDS ===== --}}
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
             {{-- Total Products --}}
-            <div class="relative bg-white rounded-2xl border border-gray-100 shadow-sm p-5 overflow-hidden group hover:shadow-md transition-shadow duration-200">
+            <div class="relative bg-white rounded-2xl border border-gray-200 shadow-sm p-5 overflow-hidden group hover:shadow-md transition-shadow duration-200">
                 <div class="absolute -top-4 -right-4 w-16 h-16 rounded-full bg-sky-50 group-hover:bg-sky-100 transition-colors"></div>
                 <div class="relative flex items-center gap-4">
                     {{-- Icon --}}
@@ -43,12 +41,14 @@
                     {{-- Title and Description --}}
                     <div>
                         <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Total Part Number</p>
-                        <p class="text-2xl font-extrabold text-gray-900">{{ $products->total() }}</p>
+                        <p class="text-2xl font-extrabold text-gray-900">
+                            {{ $products->total() }}
+                        </p>
                     </div>
                 </div>
             </div>
             {{-- Total QTY In --}}
-            <div class="relative bg-white rounded-2xl border border-gray-100 shadow-sm p-5 overflow-hidden group hover:shadow-md transition-shadow duration-200">
+            <div class="relative bg-white rounded-2xl border border-gray-200 shadow-sm p-5 overflow-hidden group hover:shadow-md transition-shadow duration-200">
                 <div class="absolute -top-4 -right-4 w-16 h-16 rounded-full bg-green-50 group-hover:bg-green-100 transition-colors"></div>
                 <div class="relative flex items-center gap-4">
                     {{-- Icon --}}
@@ -65,7 +65,7 @@
                 </div>
             </div>
             {{-- Total QTY Out --}}
-            <div class="relative bg-white rounded-2xl border border-gray-100 shadow-sm p-5 overflow-hidden group hover:shadow-md transition-shadow duration-200">
+            <div class="relative bg-white rounded-2xl border border-gray-200 shadow-sm p-5 overflow-hidden group hover:shadow-md transition-shadow duration-200">
                 <div class="absolute -top-4 -right-4 w-16 h-16 rounded-full bg-red-50 group-hover:bg-red-100 transition-colors"></div>
                 <div class="relative flex items-center gap-4">
                     {{-- Icon --}}
@@ -105,7 +105,7 @@
                     </button>
                 </div>
             </div>
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
                 {{-- Search bar --}}
                 <div class="p-4 border-b border-gray-100">
                     <form id="product-search-form" method="GET" action="{{ route('products.index') }}" class="flex items-center gap-2">
