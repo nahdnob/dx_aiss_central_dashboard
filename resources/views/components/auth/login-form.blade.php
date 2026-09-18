@@ -2,27 +2,27 @@
     {{-- Left Panel: DENSO Welcome --}}
     <div class="relative hidden sm:flex w-5/12 flex-col justify-between overflow-hidden p-7"
          style="background: url('{{ asset('assets/images/denso-background.png') }}') center center / cover no-repeat; background-color: white;">
-        <div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/70 via-white/60 to-white/85"></div>
+        <div class="pointer-events-none absolute inset-0"></div>
 
         {{-- DENSO Logo --}}
         <div class="relative z-10">
             <img src="{{ asset('img/denso_logo.png') }}"
-                 class="h-14 w-auto object-contain" alt="DENSO">
+                 class="h-20 w-auto object-contain" alt="DENSO">
         </div>
 
         {{-- Welcome Text --}}
-        <div class="relative z-10 my-8 max-w-[15rem]">
+        <!-- <div class="relative z-10 my-8 max-w-[15rem]">
             <h2 class="text-2xl font-extrabold leading-tight text-gray-800">
                 Welcome <span class="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-rose-900">Back!</span>
             </h2>
             <p class="mt-3 text-sm leading-relaxed text-gray-500">
                 Sign in to access the AISS Central Dashboard and monitor your production line in real time.
             </p>
-        </div>
+        </div> -->
 
         {{-- Footer --}}
         <div class="relative z-10">
-            <p class="text-[9px] text-gray-400 tracking-wide">
+            <p class="text-xs text-gray-400 tracking-wide">
                 © {{ date('Y') }} DENSO CORPORATION
             </p>
         </div>
@@ -34,8 +34,11 @@
             @csrf
             {{-- Header --}}
             <div class="pb-1">
-                <h1 class="text-2xl font-extrabold text-gray-800">
-                    Sign In
+                <h1 class="text-2xl font-extrabold text-slate-400 uppercase">
+                    AISS
+                </h1>
+                <h1 class="text-2xl font-extrabold text-slate-700 uppercase">
+                    Central Dashboard
                 </h1>
                 <p class="text-sm text-gray-400 mt-1">Enter your NPK and password to continue</p>
             </div>

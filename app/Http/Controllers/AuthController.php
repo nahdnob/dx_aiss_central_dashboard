@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;   // Untuk login, logout, cek status auth
+use Illuminate\Support\Facades\Hash;   // Untuk hash password
 
 use Illuminate\Http\Request;
-
 use Illuminate\View\View;
 
 use App\Models\Line;
@@ -14,48 +13,54 @@ use App\Models\User;
 
 class AuthController extends Controller
 {
+    // Registrasi user baru
     public function register(Request $request) {
 
+        // Validasi input
         $request->validate([
             'npk'      => 'required|unique:users',
             'name'     => 'required',
             'image'    => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'password' => 'required|min:6'
-            // 'email'    => 'required|email|unique:users',
         ]);
 
         $imagePath = null;
 
+        // Simpan foto (jika ada)
         if ($request->hasFile('image')) {
+
             $imagePath = $request->file('image')->store('users', 'public');
         }
 
+        // Simpan user baru (password di-hash)
         $user = User::create([
             'npk'      => $request->npk,
             'name'     => $request->name,
             'role'     => 'user',
             'image'    => $imagePath,
             'password' => Hash::make($request->password)
-            // 'email'    => $request->email,
         ]);
 
-        Auth::login($user);
+        Auth::login($user); // Auto-login setelah daftar
 
         return redirect()->route('dashboards.index')
             ->with('success', 'Registrasi berhasil, selamat datang!');
     }
 
+    // Tampilkan form login
     public function showLoginForm()
     {
+        // Kalau sudah login, langsung redirect
         if (Auth::check()) {
             return redirect()->route(session('selected_line_id') ? 'system-managers.index' : 'dashboards.index');
         }
 
-        $lines = Line::orderBy('name')->get();
+        $lines = Line::orderBy('name')->get(); // Data untuk dropdown line
 
         return view('auth.login', compact('lines'));
     }
 
+    // Proses login
     public function login(Request $request) {
 
         $credentials = $request->validate([
@@ -63,21 +68,22 @@ class AuthController extends Controller
             'password' => 'required'
         ]);
 
+        // Coba autentikasi
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
 
-            $request->session()->regenerate();
+            $request->session()->regenerate(); // Cegah session fixation
 
             if ($request->wantsJson()) {
                 return response()->json([
                     'success'    => true,
-                    'csrf_token' => csrf_token(),
+                    'csrf_token' => csrf_token(), // Token baru untuk request selanjutnya
                 ]);
             }
 
-            return redirect()->route('dashboards.index')
-                ->with('success', 'Login berhasil!');
+            return redirect()->route('dashboards.index')->with('success', 'Login berhasil!');
         }
 
+        // Login gagal
         if ($request->wantsJson()) {
             return response()->json([
                 'success' => false,
@@ -85,19 +91,17 @@ class AuthController extends Controller
             ], 401);
         }
 
-        return back()
-            ->with('error', 'NPK atau password salah')
-            ->withInput();
+        return back()->with('error', 'NPK atau password salah')->withInput(); // Kembalikan input lama (password tidak ikut)
     }
 
+    // Proses logout
     public function logout(Request $request) {
 
         Auth::logout();
 
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        $request->session()->invalidate();     // Hapus session
+        $request->session()->regenerateToken(); // Buat CSRF token baru
 
-        return redirect('/')
-            ->with('success', 'Logout berhasil!');
+        return redirect('/')->with('success', 'Logout berhasil!');
     }
 }

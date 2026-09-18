@@ -28,10 +28,13 @@
             />
         </x-ui.modal>
     @endauth
+
     <x-ui.modal id="login-modal" maxWidth="max-w-3xl">
         <x-auth.login-form />
     </x-ui.modal>
 
     <script src="https://cdn.jsdelivr.net/npm/@tailwindplus/elements@1" type="module"></script>
+
+    @stack('scripts')
 </body>
 </html>

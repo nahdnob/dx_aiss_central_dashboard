@@ -30,7 +30,7 @@
 
         {{-- ===== FORM OPERATIONS INPUT ===== --}}
         <div class="mb-6">
-            {{-- Title --}}
+            {{-- Title and Description --}}
             <div class="ml-2 mb-3">
                 <p class="text-xs font-bold tracking-widest text-red-600 uppercase">Operations Input</p>
                 <h2 class="text-xl font-bold text-gray-900">Add New Machine</h2>
@@ -190,11 +190,10 @@
                                         {{-- Open + Edit Group --}}
                                         <div class="inline-flex items-center rounded-full bg-gradient-to-r from-sky-500 to-sky-600 overflow-hidden shadow-sm">
                                             {{-- Open --}}
-                                            <a
-                                                href="{{ route('machines.show', ['id' => $item->asset_no]) }}"
-                                                target="_blank"
-                                                title="Open"
-                                                class="w-10 h-8 flex items-center justify-center text-white hover:bg-white/10 transition"
+                                            <a class="w-10 h-8 flex items-center justify-center text-white hover:bg-white/10 transition"
+                                                href    ="{{ route('machines.show', ['id' => $item->asset_no]) }}"
+                                                target  ="_blank"
+                                                title   ="Open"
                                             >
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24">
                                                     <path stroke="currentColor" stroke-width="2" d="M21 12c0 1.2-4.03 6-9 6s-9-4.8-9-6c0-1.2 4.03-6 9-6s9 4.8 9 6Z"/>
@@ -281,9 +280,11 @@
     </div>
     <x-ui.footer />
 </div>
+@endsection
+
+@push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    // ADD FORM — File input
     const buttonImagePath = document.getElementById('button-image-path');
     const inputImagePath  = document.getElementById('image-path');
     const spanImagePath   = document.getElementById('span-image-path');
@@ -291,21 +292,11 @@ document.addEventListener('DOMContentLoaded', function () {
     if (buttonImagePath && inputImagePath) {
         buttonImagePath.addEventListener('click', () => inputImagePath.click());
         inputImagePath.addEventListener('change', () => {
-            spanImagePath.textContent = inputImagePath.files.length > 0 ? inputImagePath.files[0].name : 'No file selected';
+            spanImagePath.textContent = inputImagePath.files.length > 0
+                ? inputImagePath.files[0].name
+                : 'No file selected';
         });
     }
-
-    // EDIT MODALS — File picker
-    document.querySelectorAll('.edit-file-btn').forEach(btn => {
-        const wrapper   = btn.closest('.flex.items-center.gap-3');
-        const fileInput = wrapper.querySelector('.edit-file-input');
-        const label     = wrapper.querySelector('.edit-file-name');
-
-        btn.addEventListener('click', () => fileInput.click());
-        fileInput.addEventListener('change', () => {
-            label.textContent = fileInput.files.length > 0 ? fileInput.files[0].name : label.textContent;
-        });
-    });
 });
 </script>
-@endsection
+@endpush
