@@ -35,7 +35,7 @@
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {{-- DASg --}}
-                <a href="{{ route('documents.dasg') }}"
+                <a href="{{ route('dasgs.index') }}"
                    class="group relative bg-white rounded-2xl border border-gray-200 shadow-sm p-5 overflow-hidden hover:shadow-md transition-all duration-200 hover:border-indigo-200">
                     <div class="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-indigo-50 group-hover:bg-indigo-100 transition-colors"></div>
                     <div class="relative flex items-center gap-4">
@@ -58,7 +58,7 @@
                 </a>
 
                 {{-- SOP --}}
-                <a href="{{ route('documents.sop') }}"
+                <a href="{{ route('sops.index') }}"
                    class="group relative bg-white rounded-2xl border border-gray-200 shadow-sm p-5 overflow-hidden hover:shadow-md transition-all duration-200 hover:border-cyan-200">
                     <div class="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-cyan-50 group-hover:bg-cyan-100 transition-colors"></div>
                     <div class="relative flex items-center gap-4">
@@ -81,7 +81,7 @@
                 </a>
 
                 {{-- Risk Assessment --}}
-                <a href="{{ route('documents.risk-assessment') }}"
+                <a href="{{ route('risk-assessments.index') }}"
                    class="group relative bg-white rounded-2xl border border-gray-200 shadow-sm p-5 overflow-hidden hover:shadow-md transition-all duration-200 hover:border-rose-200">
                     <div class="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-rose-50 group-hover:bg-rose-100 transition-colors"></div>
                     <div class="relative flex items-center gap-4">

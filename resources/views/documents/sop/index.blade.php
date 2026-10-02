@@ -36,7 +36,7 @@
             </div>
             {{-- Form --}}
             <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
-                <form action="{{ route('documents.sop.store') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('sops.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="flex flex-col sm:flex-row gap-3 items-end">
                         <div class="flex-1 min-w-0">
@@ -128,7 +128,7 @@
             <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
                 {{-- Search bar --}}
                 <div class="p-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <form id="sop-search-form" method="GET" action="{{ route('documents.sop') }}" class="flex items-center gap-2 flex-1 max-w-lg">
+                    <form id="sop-search-form" method="GET" action="{{ route('sops.index') }}" class="flex items-center gap-2 flex-1 max-w-lg">
                         {{-- Search Input --}}
                         <div class="relative flex-1">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -147,7 +147,7 @@
                         </button>
                         {{-- Button Reset --}}
                         @if(request('search'))
-                            <a href="{{ route('documents.sop') }}" class="px-4 py-2.5 text-sm font-bold text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200 transition shrink-0 uppercase">
+                            <a href="{{ route('sops.index') }}" class="px-4 py-2.5 text-sm font-bold text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200 transition shrink-0 uppercase">
                                 Reset
                             </a>
                         @endif
@@ -220,7 +220,7 @@
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                                 </svg>
                                             </a>
-                                            <form action="{{ route('documents.sop.destroy', $item->id) }}" method="POST" class="inline" onsubmit="return confirm('Delete this document?')">
+                                            <form action="{{ route('sops.destroy', $item->id) }}" method="POST" class="inline" onsubmit="return confirm('Delete this document?')">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" title="Delete"
@@ -276,7 +276,7 @@
                             </div>
 
                             {{-- Modal Body --}}
-                            <form action="{{ route('documents.sop.update', $item->id) }}" method="POST" enctype="multipart/form-data" class="flex flex-col flex-1 overflow-hidden">
+                            <form action="{{ route('sops.update', $item->id) }}" method="POST" enctype="multipart/form-data" class="flex flex-col flex-1 overflow-hidden">
                                 @csrf
                                 @method('PUT')
 

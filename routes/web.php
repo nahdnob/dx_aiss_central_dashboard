@@ -20,26 +20,28 @@ use App\Http\Controllers\UserController;
 
 use Illuminate\Support\Facades\Route;
 
-// =========================================================================
-// Auth - publik (belum login)
-// =========================================================================
+// Auth - Public
 Route::get('/', [AuthController::class, 'showLoginForm'])->name('login.form');
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login.page');
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// =========================================================================
-// Route publik yang SENGAJA tanpa proteksi (display TV / kebutuhan line)
-// =========================================================================
+// Line Selector
+Route::post('/select-line', [LineController::class, 'select'])->name('line-selector.select');
+
+// Machines - Specific machine view
 Route::get('machines/{id}', [MachineController::class, 'show'])->name('machines.show');
+
+// Product - fetch product table (AJAX)
 Route::get('/fetch-products-table', [DashboardController::class, 'fetchProductsTable'])->name('products.fetchTable');
+
+// Masrquee Text - update (AJAX)
 Route::post('/marqueeText/update', [MarqueeTextController::class, 'update'])->name('marqueeText.update');
 
+// Auth - Private (login required)
 Route::middleware(['auth'])->group(function () {
 
-    // =====================================================================
     // TIER 1: Semua role login (admin, leader, user)
-    // =====================================================================
     Route::middleware(['role:admin,leader,user'])->group(function () {
 
         // Dashboard
@@ -47,7 +49,6 @@ Route::middleware(['auth'])->group(function () {
 
         // Line Selector
         Route::get('/select-line', [LineController::class, 'index'])->name('line-selector.index');
-        Route::post('/select-line', [LineController::class, 'select'])->name('line-selector.select');
         Route::post('/clear-line', [LineController::class, 'clear'])->name('line-selector.clear');
 
         Route::middleware(['line.selected'])->group(function () {
@@ -59,9 +60,9 @@ Route::middleware(['auth'])->group(function () {
 
             // Documents - index (lihat daftar dokumen, boleh semua role)
             Route::get('/documents', [DocumentController::class, 'index'])->name('documents.index');
-            Route::get('documents/dasg', [DasgController::class, 'index'])->name('documents.dasg');
-            Route::get('documents/sop', [SopController::class, 'index'])->name('documents.sop');
-            Route::get('documents/risk-assessment', [RiskAssessmentController::class, 'index'])->name('documents.risk-assessment');
+            Route::get('dasgs', [DasgController::class, 'index'])->name('dasgs.index');
+            Route::get('sops', [SopController::class, 'index'])->name('sops.index');
+            Route::get('risk-assessments', [RiskAssessmentController::class, 'index'])->name('risk-assessments.index');
 
             // Cycle Times - Monitoring (read-only untuk semua role)
             Route::get('/cycletimes/monitoring', [CycleTimeController::class, 'index'])->name('cycletimes.monitoring.index');
@@ -100,28 +101,28 @@ Route::middleware(['auth'])->group(function () {
             Route::resource('products', ProductController::class);
 
             // Documents - kelola (create/update/delete)
-            Route::resource('documents/dasg', DasgController::class)
+            Route::resource('dasgs', DasgController::class)
                 ->only(['store', 'update', 'destroy'])
                 ->names([
-                    'store'   => 'documents.dasg.store',
-                    'update'  => 'documents.dasg.update',
-                    'destroy' => 'documents.dasg.destroy',
+                    'store'   => 'dasgs.store',
+                    'update'  => 'dasgs.update',
+                    'destroy' => 'dasgs.destroy',
                 ]);
 
-            Route::resource('documents/sop', SopController::class)
+            Route::resource('sops', SopController::class)
                 ->only(['store', 'update', 'destroy'])
                 ->names([
-                    'store'   => 'documents.sop.store',
-                    'update'  => 'documents.sop.update',
-                    'destroy' => 'documents.sop.destroy',
+                    'store'   => 'sops.store',
+                    'update'  => 'sops.update',
+                    'destroy' => 'sops.destroy',
                 ]);
 
-            Route::resource('documents/risk-assessment', RiskAssessmentController::class)
+            Route::resource('risk-assessments', RiskAssessmentController::class)
                 ->only(['store', 'update', 'destroy'])
                 ->names([
-                    'store'   => 'documents.risk-assessment.store',
-                    'update'  => 'documents.risk-assessment.update',
-                    'destroy' => 'documents.risk-assessment.destroy',
+                    'store'   => 'risk-assessments.store',
+                    'update'  => 'risk-assessments.update',
+                    'destroy' => 'risk-assessments.destroy',
                 ]);
 
             // Cycle Times Setting

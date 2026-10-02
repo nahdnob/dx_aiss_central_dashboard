@@ -47,7 +47,7 @@ class RiskAssessmentController extends Controller
 
         RiskAssessment::create($validated);
 
-        return redirect()->route('documents.risk-assessment')->with('success', 'Risk Assessment document created successfully.');
+        return redirect()->route('risk-assessments.index')->with('success', 'Risk Assessment document created successfully.');
     }
 
     /**
@@ -69,7 +69,7 @@ class RiskAssessmentController extends Controller
 
         $riskAssessment->update($validated);
 
-        return redirect()->route('documents.risk-assessment')->with('success', 'Risk Assessment document updated successfully.');
+        return redirect()->route('risk-assessments.index')->with('success', 'Risk Assessment document updated successfully.');
     }
 
     /**
@@ -78,6 +78,6 @@ class RiskAssessmentController extends Controller
     public function destroy(RiskAssessment $riskAssessment)
     {
         $riskAssessment->delete();
-        return redirect()->route('documents.risk-assessment')->with('success', 'Risk Assessment document deleted successfully.');
+        return redirect()->route('risk-assessments.index')->with('success', 'Risk Assessment document deleted successfully.');
     }
 }

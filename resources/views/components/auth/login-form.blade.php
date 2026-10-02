@@ -114,15 +114,6 @@
                     const data = await res.json().catch(() => ({}));
 
                     if (res.ok && data.success) {
-                        // The session (and its CSRF token) was regenerated on login, so any
-                        // forms already rendered on this page (e.g. the line-select modal)
-                        // are carrying a now-stale _token — refresh them before they're used.
-                        if (data.csrf_token) {
-                            document.querySelectorAll('input[name="_token"]').forEach((input) => {
-                                input.value = data.csrf_token;
-                            });
-                        }
-
                         if (document.getElementById('line-select-modal')) {
                             window.Modal?.open('line-select-modal');
                         } else {

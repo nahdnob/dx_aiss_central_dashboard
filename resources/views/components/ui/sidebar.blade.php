@@ -130,16 +130,16 @@
 
             <div x-show="open" x-collapse
                  class="flex flex-col ml-9 mt-1 space-y-1 opacity-0 overflow-hidden transition-opacity duration-200 group-hover:opacity-100">
-                <a href="{{ route('documents.dasg') }}"
-                   class="text-sm py-1.5 px-3 rounded-lg transition-colors duration-150 {{ request()->routeIs('documents.dasg') ? 'text-red-600 bg-red-50 font-semibold' : 'text-gray-500 hover:text-red-500 hover:bg-gray-50' }}">
+                     <a href="{{ route('dasgs.index') }}"
+                         class="text-sm py-1.5 px-3 rounded-lg transition-colors duration-150 {{ request()->routeIs('dasgs.*') ? 'text-red-600 bg-red-50 font-semibold' : 'text-gray-500 hover:text-red-500 hover:bg-gray-50' }}">
                     DASg
                 </a>
-                <a href="{{ route('documents.sop') }}"
-                   class="text-sm py-1.5 px-3 rounded-lg transition-colors duration-150 {{ request()->routeIs('documents.sop') ? 'text-red-600 bg-red-50 font-semibold' : 'text-gray-500 hover:text-red-500 hover:bg-gray-50' }}">
+                     <a href="{{ route('sops.index') }}"
+                         class="text-sm py-1.5 px-3 rounded-lg transition-colors duration-150 {{ request()->routeIs('sops.*') ? 'text-red-600 bg-red-50 font-semibold' : 'text-gray-500 hover:text-red-500 hover:bg-gray-50' }}">
                     SOP
                 </a>
-                <a href="{{ route('documents.risk-assessment') }}"
-                   class="text-sm py-1.5 px-3 rounded-lg transition-colors duration-150 {{ request()->routeIs('documents.risk-assessment') ? 'text-red-600 bg-red-50 font-semibold' : 'text-gray-500 hover:text-red-500 hover:bg-gray-50' }}">
+                     <a href="{{ route('risk-assessments.index') }}"
+                         class="text-sm py-1.5 px-3 rounded-lg transition-colors duration-150 {{ request()->routeIs('risk-assessments.*') ? 'text-red-600 bg-red-50 font-semibold' : 'text-gray-500 hover:text-red-500 hover:bg-gray-50' }}">
                     Risk Assessment
                 </a>
             </div>

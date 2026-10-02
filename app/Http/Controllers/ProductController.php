@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 //import model
 use App\Models\ProductSummary;
+use App\Models\ProductIn;
 use App\Services\Production\SummaryService;
 
 use Illuminate\Http\Request;
@@ -19,26 +20,30 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        //INPUT
+        // INPUT
         $search = $request->input('search');
 
-        $query = ProductSummary::where('line_id', session('selected_line_id'))
+        // PROCESS
+        $products = ProductSummary::where('line_id', session('selected_line_id'))
             ->with([
                 'firstProductIn:id,part_number,time_in',
                 'lastProductIn:id,product_out_id,part_number,time_in',
                 'lastProductIn.productOut:id,tag_id,part_number,time_out',
-            ])->orderBy('created_at', 'desc');
+            ])
+            ->paginate(10, ['*'], 'page_products')
+            ->withQueryString();
 
-        if ($search) {
-            $query->where('part_number', 'like', "%{$search}%");
-        }
+        $datas = ProductIn::where('line_id', session('selected_line_id'))
+            ->select('id', 'product_out_id', 'part_id', 'part_number', 'time_in', 'quantity')
+            ->with('productOut:id,tag_id,part_number,time_out')
+            ->when($search, fn ($q) => $q->where('part_id', 'like', "%{$search}%"))
+            ->orderBy('id', 'desc')
+            ->paginate(10, ['*'], 'page_parts')
+            ->withQueryString();
 
-        //PROCESS
-        $products = $query->paginate(10)->appends(request()->query());
-
-        //OUTPUT
-        return view('products.index', compact('products'));
-    }   
+        // OUTPUT
+        return view('products.index', compact('products', 'datas'));
+    }
 
     /**
      * Show the form for creating a new resource.

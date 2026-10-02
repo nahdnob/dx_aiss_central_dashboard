@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Line;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
 class LineController extends Controller
@@ -27,6 +29,17 @@ class LineController extends Controller
         ]);
 
         $line = Line::findOrFail($request->line_id);
+
+        if (!Auth::check()) {
+            $pendingLogin = session('pending_login');
+
+            abort_unless($pendingLogin, 403, 'Silakan login terlebih dahulu.');
+
+            $user = User::findOrFail($pendingLogin['user_id']);
+            Auth::login($user, (bool) $pendingLogin['remember']);
+            $request->session()->regenerate();
+            $request->session()->forget('pending_login');
+        }
 
         session([
             'selected_line_id'   => $line->id,

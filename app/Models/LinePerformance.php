@@ -13,7 +13,7 @@ class LinePerformance extends Model
      *
      * @var array
      */
-    protected $fillable = ['month', 'year', 'target', 'actual', 'line_id'];
+    protected $fillable = ['line_id', 'month', 'year', 'target', 'actual'];
 
     public function line()
     {

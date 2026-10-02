@@ -51,7 +51,7 @@ class DasgController extends Controller
 
         Dasg::create($validated);
 
-        return redirect()->route('documents.dasg')->with('success', 'DASg document created successfully.');
+        return redirect()->route('dasgs.index')->with('success', 'DASg document created successfully.');
     }
 
     /**
@@ -73,7 +73,7 @@ class DasgController extends Controller
 
         $dasg->update($validated);
 
-        return redirect()->route('documents.dasg')->with('success', 'DASg document updated successfully.');
+        return redirect()->route('dasgs.index')->with('success', 'DASg document updated successfully.');
     }
 
     /**
@@ -82,6 +82,6 @@ class DasgController extends Controller
     public function destroy(Dasg $dasg)
     {
         $dasg->delete();
-        return redirect()->route('documents.dasg')->with('success', 'DASg document deleted successfully.');
+        return redirect()->route('dasgs.index')->with('success', 'DASg document deleted successfully.');
     }
 }

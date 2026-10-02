@@ -59,7 +59,7 @@ class SopController extends Controller
             RiskAssessment::where('id', $request->ra_id)->update(['sop_id' => $sop->id]);
         }
 
-        return redirect()->route('documents.sop')->with('success', 'SOP document created successfully.');
+        return redirect()->route('sops.index')->with('success', 'SOP document created successfully.');
     }
 
     public function update(Request $request, Sop $sop){
@@ -96,13 +96,13 @@ class SopController extends Controller
         $dasgIds = $request->input('dasg_ids', []);
         $sop->dasgs()->sync($dasgIds);
 
-        return redirect()->route('documents.sop')->with('success', 'SOP document updated successfully.');
+        return redirect()->route('sops.index')->with('success', 'SOP document updated successfully.');
     }
 
     public function destroy(Sop $sop)
     {
         $sop->delete();
 
-        return redirect()->route('documents.sop')->with('success', 'SOP document deleted successfully.');
+        return redirect()->route('sops.index')->with('success', 'SOP document deleted successfully.');
     }
 }

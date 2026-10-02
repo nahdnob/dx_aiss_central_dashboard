@@ -68,19 +68,22 @@ class AuthController extends Controller
             'password' => 'required'
         ]);
 
-        // Coba autentikasi
-        if (Auth::attempt($credentials, $request->boolean('remember'))) {
+        // Verify credentials without authenticating until a line is selected.
+        if (Auth::validate($credentials)) {
+            $user = User::where('npk', $credentials['npk'])->firstOrFail();
 
-            $request->session()->regenerate(); // Cegah session fixation
+            $request->session()->put('pending_login', [
+                'user_id' => $user->id,
+                'remember' => $request->boolean('remember'),
+            ]);
 
             if ($request->wantsJson()) {
                 return response()->json([
                     'success'    => true,
-                    'csrf_token' => csrf_token(), // Token baru untuk request selanjutnya
                 ]);
             }
 
-            return redirect()->route('dashboards.index')->with('success', 'Login berhasil!');
+            return redirect()->route('line-selector.index');
         }
 
         // Login gagal

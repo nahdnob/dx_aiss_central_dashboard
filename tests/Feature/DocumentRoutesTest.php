@@ -14,19 +14,19 @@ class DocumentRoutesTest extends TestCase
 
     public function test_dasg_index_loads_successfully(): void
     {
-        $response = $this->get('/documents/dasg');
+        $response = $this->get('/dasgs');
         $response->assertStatus(200);
     }
 
     public function test_risk_assessment_index_loads_successfully(): void
     {
-        $response = $this->get('/documents/risk-assessment');
+        $response = $this->get('/risk-assessments');
         $response->assertStatus(200);
     }
 
     public function test_sop_index_loads_successfully(): void
     {
-        $response = $this->get('/documents/sop');
+        $response = $this->get('/sops');
         $response->assertStatus(200);
     }
 

@@ -60,7 +60,7 @@
                     {{-- Title and Description --}}
                     <div>
                         <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Total QTY In</p>
-                        <p class="text-2xl font-extrabold text-gray-900">{{ $products->sum('qty_in') ?? 0 }}</p>
+                        <p class="text-2xl font-extrabold text-gray-900">{{ $products->sum('quantity') ?? 0 }}</p>
                     </div>
                 </div>
             </div>
@@ -82,13 +82,13 @@
                 </div>
             </div>
         </div>
-        {{-- ===== DATA TABLE ===== --}}
-        <div>
+        {{-- ===== PRODUCTION MONITORING ===== --}}
+        <div class="mb-6">
             <div class="flex items-end justify-between mb-3">
                 {{-- Title and Description --}}
                 <div class="ml-2">
-                    <p class="text-xs font-bold tracking-widest text-red-600 uppercase">Production Data</p>
-                    <h2 class="text-xl font-bold text-gray-900">Part Tracking</h2>
+                    <p class="text-xs font-bold tracking-widest text-red-600 uppercase">Production Monitoring</p>
+                    <h2 class="text-xl font-bold text-gray-900">Production Progress</h2>
                 </div>
                 <div class="flex items-center gap-2">
                     {{-- Button Filter --}}
@@ -106,34 +106,6 @@
                 </div>
             </div>
             <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                {{-- Search bar --}}
-                <div class="p-4 border-b border-gray-100">
-                    <form id="product-search-form" method="GET" action="{{ route('products.index') }}" class="flex items-center gap-2">
-                        {{-- Search Input --}}
-                        <div class="relative flex-1 max-w-sm">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m21 21-3.5-3.5M17 10a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                                </svg>
-                            </div>
-                            <input type="search" id="search" name="search"
-                                   value="{{ request('search') }}"
-                                   placeholder="Search part number..."
-                                   class="block w-full pl-9 pr-4 py-2.5 text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent transition"/>
-                        </div>
-                        {{-- Button Search --}}
-                        <button type="submit"
-                                class="px-4 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-red-600 to-rose-700 rounded-xl hover:brightness-110 shadow-sm shadow-red-200 transition">
-                            Search
-                        </button>
-                        {{-- Button Reset --}}
-                        @if(request('search'))
-                            <a href="{{ route('products.index') }}" class="px-4 py-2.5 text-sm font-bold text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200 transition">
-                                Reset
-                            </a>
-                        @endif
-                    </form>
-                </div>
                 {{-- Table --}}
                 <table class="w-full text-sm text-left">
                     {{-- Table Header --}}
@@ -232,7 +204,7 @@
                                         <svg class="w-10 h-10 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                                         </svg>
-                                        <span class="text-sm">Belum ada data produksi.</span>
+                                        <span class="text-sm">No productions data yet.</span>
                                     </div>
                                 </td>
                             </tr>
@@ -255,6 +227,144 @@
                         @endif
                         @if ($products->hasMorePages())
                             <a href="{{ $products->nextPageUrl() }}"
+                               class="px-4 py-1.5 text-xs font-bold text-white bg-gradient-to-r from-red-600 to-rose-700 rounded-lg hover:brightness-110 shadow-sm shadow-red-200 transition">
+                                Next
+                            </a>
+                        @else
+                            <span class="px-4 py-1.5 text-xs font-bold text-white bg-red-300 rounded-lg cursor-not-allowed">Next</span>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{-- ===== DATA TABLE ===== --}}
+        <div>
+            <div class="flex items-end justify-between mb-3">
+                {{-- Title and Description --}}
+                <div class="ml-2">
+                    <p class="text-xs font-bold tracking-widest text-red-600 uppercase">Production Data</p>
+                    <h2 class="text-xl font-bold text-gray-900">Part Tracking</h2>
+                </div>
+                <div class="flex items-center gap-2">
+                    {{-- Button Filter --}}
+                    <button class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-500 transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h18M7 10h10M11 16h2"/>
+                        </svg>
+                    </button>
+                    {{-- Button Export --}}
+                    <button class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-500 transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V4"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                {{-- Search bar --}}
+                <div class="p-4 border-b border-gray-100">
+                    <form id="product-search-form" method="GET" action="{{ route('products.index') }}" class="flex items-center gap-2">
+                        {{-- Search Input --}}
+                        <div class="relative flex-1 max-w-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m21 21-3.5-3.5M17 10a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                </svg>
+                            </div>
+                            <input class="placeholder:text-gray-400 block w-full pl-9 pr-4 py-2.5 text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent transition"
+                                type        ="search"
+                                id          ="search"
+                                name        ="search"
+                                value       ="{{ request('search') }}"
+                                placeholder ="Search part number..."/>
+                        </div>
+                        {{-- Button Search --}}
+                        <button type="submit" class="px-4 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-sky-500 to-sky-600 rounded-xl hover:brightness-110 shadow-sm transition shrink-0 uppercase">
+                            Search
+                        </button>
+                        {{-- Button Reset --}}
+                        @if(request('search'))
+                            <a href="{{ route('products.index') }}" class="px-4 py-2.5 text-sm font-bold text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200 transition">
+                                Reset
+                            </a>
+                        @endif
+                    </form>
+                </div>
+                {{-- Table --}}
+                <table class="w-full text-sm text-left">
+                    {{-- Table Header --}}
+                    <thead>
+                        <tr class="border-b border-gray-100">
+                            <th class="px-5 py-3 text-[10px] font-bold tracking-widest text-gray-400 uppercase">PCB ID</th>
+                            <th class="px-5 py-3 text-[10px] font-bold tracking-widest text-gray-400 uppercase">Part Number</th>
+                            <th class="px-5 py-3 text-[10px] font-bold tracking-widest text-gray-400 uppercase">Time In</th>
+                            <th class="px-5 py-3 text-[10px] font-bold tracking-widest text-gray-400 uppercase">Kanban ID</th>
+                            <th class="px-5 py-3 text-[10px] font-bold tracking-widest text-gray-400 uppercase">Time Out</th>
+                        </tr>
+                    </thead>
+                    {{-- Table Body --}}
+                    <tbody class="divide-y divide-gray-50">
+                        @forelse ($datas as $item)
+                            <!-- @php
+                                $timeIn  = $item->firstProductIn['time_in'] ?? null;
+                                $timeOut = $item->lastProductIn->productOut->time_out ?? null;
+                                $qtyIn   = $item->qty_in ?? 0;
+                                $qtyOut  = $item->qty_out ?? 0;
+                                $flowPct = $qtyIn > 0 ? round(($qtyOut / $qtyIn) * 100, 1) : 0;
+                            @endphp -->
+                            <tr class="hover:bg-red-50/40 transition-colors duration-150 group">
+                                <!-- Part ID -->
+                                <td class="px-5 py-4 whitespace-nowrap">
+                                    <span class="font-semibold text-slate-700 text-sm">{{ $item->part_id }}</span>
+                                </td>
+                                <!-- Part Number -->
+                                <td class="px-5 py-4 whitespace-nowrap">
+                                    <span class="font-semibold text-slate-700 text-sm">{{ $item->part_number }}</span>
+                                </td>
+                                <!-- Time In -->
+                                <td class="px-5 py-4 whitespace-nowrap">
+                                    <span class="font-semibold text-slate-700 text-sm">{{ \Carbon\Carbon::parse($item->time_in)->format('Y-m-d H:i') ?? '—' }}</span>
+                                </td>
+                                <!-- Kanban ID -->
+                                <td class="px-5 py-4 whitespace-nowrap">
+                                    <span class="font-semibold text-slate-700 text-sm">{{ $item->productOut->tag_id ?? '-' }}</span>
+                                </td>
+                                <!-- Time Out -->
+                                <td class="px-5 py-4 whitespace-nowrap">
+                                    <span class="font-semibold text-slate-700 text-sm">{{ $item->productOut?->time_out ? \Carbon\Carbon::parse($item->productOut->time_out)->format('Y-m-d H:i') : '-' }}</span>
+                                </td>
+                            </tr>
+                        @empty
+                            {{-- Empty State --}}
+                            <tr>
+                                <td colspan="6" class="px-5 py-12 text-center text-gray-400">
+                                    <div class="flex flex-col items-center gap-2">
+                                        <svg class="w-10 h-10 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                                        </svg>
+                                        <span class="text-sm">No productions data yet.</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+                {{-- Footer Pagination --}}
+                <div class="flex items-center justify-between px-5 py-3 border-t border-gray-100">
+                    <p class="text-xs text-red-500 font-medium">
+                        Showing {{ $datas->firstItem() ?? 0 }}–{{ $datas->lastItem() ?? 0 }} of {{ $datas->total() }} parts
+                    </p>
+                    <div class="flex items-center gap-2">
+                        @if ($datas->onFirstPage())
+                            <span class="px-4 py-1.5 text-xs font-semibold text-gray-300 border border-gray-200 rounded-lg cursor-not-allowed">Previous</span>
+                        @else
+                            <a href="{{ $datas->previousPageUrl() }}"
+                               class="px-4 py-1.5 text-xs font-semibold text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
+                                Previous
+                            </a>
+                        @endif
+                        @if ($datas->hasMorePages())
+                            <a href="{{ $datas->nextPageUrl() }}"
                                class="px-4 py-1.5 text-xs font-bold text-white bg-gradient-to-r from-red-600 to-rose-700 rounded-lg hover:brightness-110 shadow-sm shadow-red-200 transition">
                                 Next
                             </a>

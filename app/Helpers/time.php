@@ -5,8 +5,8 @@ use Carbon\Carbon;
 function production_date(Carbon $now): string
 {
     return $now->format('H:i:s') < '07:30:00'
-            ? $now->copy()->subDay()->toDateString()
-            : $now->toDateString();
+         ? $now->copy()->subDay()->toDateString()
+         : $now->toDateString();
 }
 
 function calculate_duration(bool $halveDuration, string $t1, string $t2): int

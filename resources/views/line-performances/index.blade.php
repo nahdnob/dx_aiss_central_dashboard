@@ -118,20 +118,20 @@
                     <p class="text-xs font-bold tracking-widest text-red-600 uppercase">Performance Data</p>
                     <h2 class="text-xl font-bold text-gray-900">Monthly Records</h2>
                 </div>
-                <div class="flex items-center gap-2">
+                <!-- <div class="flex items-center gap-2"> -->
                     {{-- Button Filter --}}
-                    <button class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-500 transition">
+                    <!-- <button class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-500 transition">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h18M7 10h10M11 16h2"/>
                         </svg>
-                    </button>
+                    </button> -->
                     {{-- Button Export --}}
-                    <button class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-500 transition">
+                    <!-- <button class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-500 transition">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V4"/>
                         </svg>
                     </button>
-                </div>
+                </div> -->
             </div>
             {{-- Table --}}
             <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
@@ -179,7 +179,7 @@
                             <th class="px-5 py-3">Target (%)</th>
                             <th class="px-5 py-3">Actual (%)</th>
                             <th class="px-5 py-3">Achievement</th>
-                            <th class="px-5 py-3">Status</th>
+                            <th class="px-5 py-3">Action</th>
                         </tr>
                     </thead>
                     {{-- Table Body --}}
@@ -194,7 +194,6 @@
                                 {{-- Period --}}
                                 <td class="px-5 py-4 whitespace-nowrap text-left">
                                     <div class="font-semibold text-gray-800 text-sm">{{ $item->year }} - {{ $item->month }}</div>
-                                    <div class="text-[11px] text-gray-400 mt-0.5">ID: LP-{{ str_pad($item->id, 4, '0', STR_PAD_LEFT) }}</div>
                                 </td>
                                 {{-- Target --}}
                                 <td class="px-5 py-4 text-gray-600 font-medium">
@@ -205,7 +204,7 @@
                                     {{ $met ? 'text-gray-600' : 'text-red-600' }}">
                                     {{ number_format($item->actual, 1) }}%
                                 </td>
-                                {{-- Achievement pie chart --}}
+                                {{-- Achievement (Pie chart) --}}
                                 <td class="px-5 py-4">
                                     <div class="flex items-center justify-center gap-3">
                                         <div class="relative w-10 h-10 shrink-0">
@@ -226,34 +225,34 @@
                                     </div>
                                 </td>
                                 {{-- Actions --}}
-<td class="px-5 py-4">
-    <div class="flex items-center justify-center gap-2">
-        <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-            {{-- Edit --}}
-            <a href="javascript:void(0)"
-               data-modal-open="edit-line-performance-modal-{{ $item->id }}"
-               class="w-8 h-8 flex items-center justify-center rounded-full bg-sky-500 text-white hover:bg-sky-600 transition shadow-sm"
-               title="Edit">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                </svg>
-            </a>
-            {{-- Delete --}}
-            <form action="{{ route('line-performance.destroy', $item->id) }}" method="POST" class="inline">
-                @csrf
-                @method('DELETE')
-                <button type="submit"
-                    onclick="return confirm('Hapus data {{ $item->month }} {{ $item->year }}?')"
-                    title="Delete"
-                    class="w-8 h-8 flex items-center justify-center rounded-full bg-red-500 text-white hover:bg-red-600 transition shadow-sm">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                    </svg>
-                </button>
-            </form>
-        </div>
-    </div>
-</td>
+                                <td class="px-5 py-4">
+                                    <div class="flex items-center justify-center gap-2">
+                                        <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+                                            {{-- Edit --}}
+                                            <a href="javascript:void(0)"
+                                            data-modal-open="edit-line-performance-modal-{{ $item->id }}"
+                                            class="w-8 h-8 flex items-center justify-center rounded-full bg-sky-500 text-white hover:bg-sky-600 transition shadow-sm"
+                                            title="Edit">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                                </svg>
+                                            </a>
+                                            {{-- Delete --}}
+                                            <form action="{{ route('line-performance.destroy', $item->id) }}" method="POST" class="inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit"
+                                                    onclick="return confirm('Hapus data {{ $item->month }} {{ $item->year }}?')"
+                                                    title="Delete"
+                                                    class="w-8 h-8 flex items-center justify-center rounded-full bg-red-500 text-white hover:bg-red-600 transition shadow-sm">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                    </svg>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </td>
                             </tr>
                             {{-- Modal Edit --}}
                             <x-ui.modal id="edit-line-performance-modal-{{ $item->id }}" maxWidth="max-w-lg">

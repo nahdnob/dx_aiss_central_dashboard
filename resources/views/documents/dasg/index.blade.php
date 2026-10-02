@@ -34,7 +34,7 @@
             </div>
             {{-- Form --}}
             <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
-                <form action="{{ route('documents.dasg.store') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('dasgs.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="flex flex-col sm:flex-row gap-3 items-end">
                         {{-- Name --}}
@@ -101,7 +101,7 @@
                     <form class="flex items-center gap-2 flex-1 max-w-lg"
                         id     ="dasg-search-form"
                         method ="GET"
-                        action ="{{ route('documents.dasg') }}">
+                        action ="{{ route('dasgs.index') }}">
 
                         {{-- Search Input --}}
                         <div class="relative flex-1">
@@ -123,7 +123,7 @@
                         </button>
                         {{-- Button Reset --}}
                         @if(request('search'))
-                            <a href="{{ route('documents.dasg') }}" class="px-4 py-2.5 text-sm font-bold text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200 transition shrink-0 uppercase">
+                            <a href="{{ route('dasgs.index') }}" class="px-4 py-2.5 text-sm font-bold text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200 transition shrink-0 uppercase">
                                 Reset
                             </a>
                         @endif
@@ -179,7 +179,7 @@
                                                 </svg>
                                             </a>
                                             <form class="inline"
-                                                action   ="{{ route('documents.dasg.destroy', $item->id) }}"
+                                                action   ="{{ route('dasgs.destroy', $item->id) }}"
                                                 method   ="POST"
                                                 onsubmit ="return confirm('Are you sure you want to delete this document?')"
                                             >
@@ -232,7 +232,7 @@
                                 </button>
                             </div>
                             {{-- Modal Body (scrollable) --}}
-                            <form action="{{ route('documents.dasg.update', $item->id) }}" method="POST" enctype="multipart/form-data" class="flex flex-col flex-1 overflow-hidden">
+                            <form action="{{ route('dasgs.update', $item->id) }}" method="POST" enctype="multipart/form-data" class="flex flex-col flex-1 overflow-hidden">
                                 @csrf
                                 @method('PUT')
                                 <div class="px-6 py-5 space-y-4 overflow-y-auto flex-1 text-left">

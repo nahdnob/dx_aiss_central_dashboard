@@ -80,7 +80,7 @@
                         {{-- Submit --}}
                         <div class="shrink-0 w-full sm:w-auto">
                             <button type="submit" class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:brightness-110 text-white font-bold text-sm px-5 py-2.5 rounded-lg shadow-sm transition-all duration-200 whitespace-nowrap uppercase">
-                                Submit Record
+                                Add
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
                                 </svg>
@@ -98,20 +98,20 @@
                     <p class="text-xs font-bold tracking-widest text-red-600 uppercase">Audit Log</p>
                     <h2 class="text-xl font-bold text-gray-900">Claim History</h2>
                 </div>
-                <div class="flex items-center gap-2">
+                <!-- <div class="flex items-center gap-2"> -->
                     {{-- BUtton Filter --}}
-                    <button class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-500 transition">
+                    <!-- <button class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-500 transition">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h18M7 10h10M11 16h2"/>
                         </svg>
-                    </button>
+                    </button> -->
                     {{-- Button Export --}}
-                    <button class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-500 transition">
+                    <!-- <button class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-500 transition">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V4"/>
                         </svg>
                     </button>
-                </div>
+                </div> -->
             </div>
             {{-- Table --}}
             <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
@@ -215,7 +215,7 @@
                                         <svg class="w-10 h-10 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                                         </svg>
-                                        <span class="text-sm">Belum ada data claim yang tercatat.</span>
+                                        <span class="text-sm text-gray-400">No data available.</span>
                                     </div>
                                 </td>
                             </tr>
