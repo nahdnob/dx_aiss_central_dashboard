@@ -70,6 +70,10 @@ class PatternController extends Controller
             'cycle_time' => 'required|numeric|min:0|max:3600',
             'max_time'   => 'required|numeric|min:0|max:3600|gt:cycle_time',
             'min_time'   => 'required|numeric|min:0|max:3600|lt:cycle_time',
+            'sensors' => 'sometimes|array',
+            'sensors.*' => 'array',
+            'sensors.*.pos' => 'nullable|integer|min:1',
+            'sensors.*.cycle' => 'nullable|integer|min:1',
         ], [
             'name.required'       => 'Nama mode wajib diisi.',
             'name.regex'          => 'Nama hanya boleh berisi huruf, angka, spasi, dan tanda minus (-).',
@@ -102,9 +106,12 @@ class PatternController extends Controller
         // 3️⃣ Sinkronisasi pivot pattern_sensor dengan kolom tambahan 'pos'
         $sensorsInput = $request->input('sensors', []);
         $syncData = [];
-        foreach ($sensorsInput as $sensorId => $posValue) {
-            if (!empty($posValue)) {
-                $syncData[$sensorId] = ['pos' => $posValue];
+        foreach ($sensorsInput as $sensorId => $sensorConfig) {
+            if (!empty($sensorConfig['pos'])) {
+                $syncData[$sensorId] = [
+                    'pos' => $sensorConfig['pos'],
+                    'cycle' => $sensorConfig['cycle'] ?? 1,
+                ];
             }
         }
         $pattern->sensors()->sync($syncData);
@@ -152,6 +159,10 @@ class PatternController extends Controller
             'cycle_time' => 'required|numeric|min:0|max:3600',
             'max_time'   => 'required|numeric|min:0|max:3600|gt:cycle_time',
             'min_time'   => 'required|numeric|min:0|max:3600|lt:cycle_time',
+            'sensors' => 'sometimes|array',
+            'sensors.*' => 'array',
+            'sensors.*.pos' => 'nullable|integer|min:1',
+            'sensors.*.cycle' => 'nullable|integer|min:1',
         ], [
             'name.required'       => 'Nama mode wajib diisi.',
             'name.regex'          => 'Nama hanya boleh berisi huruf, angka, spasi, dan tanda minus (-).',
@@ -183,9 +194,12 @@ class PatternController extends Controller
         // 4️⃣ Sinkronisasi pivot pattern_sensor dengan kolom tambahan 'pos'
         $sensorsInput = $request->input('sensors', []);
         $syncData = [];
-        foreach ($sensorsInput as $sensorId => $posValue) {
-            if (!empty($posValue)) {
-                $syncData[$sensorId] = ['pos' => $posValue];
+        foreach ($sensorsInput as $sensorId => $sensorConfig) {
+            if (!empty($sensorConfig['pos'])) {
+                $syncData[$sensorId] = [
+                    'pos' => $sensorConfig['pos'],
+                    'cycle' => $sensorConfig['cycle'] ?? 1,
+                ];
             }
         }
         $pattern->sensors()->sync($syncData);

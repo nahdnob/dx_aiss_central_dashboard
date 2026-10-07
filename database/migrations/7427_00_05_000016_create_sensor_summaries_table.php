@@ -20,6 +20,7 @@ return new class extends Migration
                   ->constrained('work_hours')
                   ->onDelete('cascade');
             $table->foreignId('pattern_id')
+                  ->nullable()
                   ->constrained('patterns')
                   ->onDelete('cascade');
             $table->foreignId('sensor_id')

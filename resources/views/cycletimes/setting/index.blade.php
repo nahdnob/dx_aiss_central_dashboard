@@ -173,10 +173,11 @@
                                         @endphp
                                         <td class="px-3 py-4 text-center">
                                             @if($activeSensor)
-                                                <div class="flex justify-center">
+                                                <div class="flex flex-col items-center gap-1">
                                                     <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-sky-100 text-sky-600 font-bold text-xs" title="Pos {{ $activeSensor->pivot->pos }}">
                                                         {{ $activeSensor->pivot->pos }}
                                                     </span>
+                                                    <span class="text-[10px] text-gray-500" title="Barang per pembacaan">Cycle {{ $activeSensor->pivot->cycle }}</span>
                                                 </div>
                                             @else
                                                 <div class="flex justify-center">
@@ -276,11 +277,19 @@
                                 {{-- Sensors --}}
                                 <div>
                                     <label class="block text-sm font-semibold text-gray-700 mb-2">Sensor Positions</label>
+                                    <p class="mb-2 text-xs text-gray-500">Cycle adalah jumlah barang dalam satu pembacaan; durasi akan dibagi nilai Cycle.</p>
                                     <div class="grid grid-cols-2 lg:grid-cols-3 gap-3">
                                         @foreach($sensors as $s)
                                             <div class="flex items-center justify-between p-2 border border-gray-100 rounded-xl hover:bg-gray-50 transition-colors">
                                                 <span class="ml-2 text-sm font-medium text-gray-700">{{ $s->name }}</span>
-                                                <input type="number" name="sensors[{{ $s->id }}]" min="1" class="w-16 h-8 text-sm text-center border-gray-300 rounded-md focus:ring-red-500 focus:border-red-500" placeholder="Pos">
+                                                <div class="grid grid-cols-2 gap-2">
+                                                    <label class="text-[10px] text-gray-500">Pos
+                                                        <input type="number" name="sensors[{{ $s->id }}][pos]" min="1" class="w-14 h-8 text-sm text-center border-gray-300 rounded-md focus:ring-red-500 focus:border-red-500" placeholder="1">
+                                                    </label>
+                                                    <label class="text-[10px] text-gray-500">Cycle
+                                                        <input type="number" name="sensors[{{ $s->id }}][cycle]" min="1" value="1" class="w-14 h-8 text-sm text-center border-gray-300 rounded-md focus:ring-red-500 focus:border-red-500" title="Jumlah barang per pembacaan">
+                                                    </label>
+                                                </div>
                                             </div>
                                         @endforeach
                                     </div>
@@ -352,15 +361,24 @@
                                 {{-- Sensors --}}
                                 <div>
                                     <label class="block text-sm font-semibold text-gray-700 mb-2">Sensor Positions</label>
+                                    <p class="mb-2 text-xs text-gray-500">Cycle adalah jumlah barang dalam satu pembacaan; durasi akan dibagi nilai Cycle.</p>
                                     <div class="grid grid-cols-2 lg:grid-cols-3 gap-3">
                                         @foreach($sensors as $s)
                                             @php 
                                                 $activeSensor = $pattern->sensors->firstWhere('id', $s->id); 
                                                 $posValue = $activeSensor ? $activeSensor->pivot->pos : '';
+                                                $cycleValue = $activeSensor ? $activeSensor->pivot->cycle : 1;
                                             @endphp
                                             <div class="flex items-center justify-between p-2 border border-gray-100 rounded-xl hover:bg-gray-50 transition-colors">
                                                 <span class="ml-2 text-sm font-medium text-gray-700">{{ $s->name }}</span>
-                                                <input type="number" name="sensors[{{ $s->id }}]" value="{{ $posValue }}" min="1" class="w-16 h-8 text-sm text-center border-gray-300 rounded-md focus:ring-sky-500 focus:border-sky-500" placeholder="Pos">
+                                                <div class="grid grid-cols-2 gap-2">
+                                                    <label class="text-[10px] text-gray-500">Pos
+                                                        <input type="number" name="sensors[{{ $s->id }}][pos]" value="{{ $posValue }}" min="1" class="w-14 h-8 text-sm text-center border-gray-300 rounded-md focus:ring-sky-500 focus:border-sky-500" placeholder="1">
+                                                    </label>
+                                                    <label class="text-[10px] text-gray-500">Cycle
+                                                        <input type="number" name="sensors[{{ $s->id }}][cycle]" value="{{ $cycleValue }}" min="1" class="w-14 h-8 text-sm text-center border-gray-300 rounded-md focus:ring-sky-500 focus:border-sky-500" title="Jumlah barang per pembacaan">
+                                                    </label>
+                                                </div>
                                             </div>
                                         @endforeach
                                     </div>

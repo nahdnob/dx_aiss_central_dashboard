@@ -8,13 +8,6 @@ class Sensor extends Model
 {
     protected $fillable = ['name', 'line_id'];
 
-    protected function casts(): array
-    {
-        return [
-            'halve_duration' => 'boolean',
-        ];
-    }
-
     public function line(){
         return $this->belongsTo(Line::class);
     }

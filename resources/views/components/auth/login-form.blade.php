@@ -3,23 +3,11 @@
     <div class="relative hidden sm:flex w-5/12 flex-col justify-between overflow-hidden p-7"
          style="background: url('{{ asset('assets/images/denso-background.png') }}') center center / cover no-repeat; background-color: white;">
         <div class="pointer-events-none absolute inset-0"></div>
-
         {{-- DENSO Logo --}}
         <div class="relative z-10">
             <img src="{{ asset('img/denso_logo.png') }}"
                  class="h-20 w-auto object-contain" alt="DENSO">
         </div>
-
-        {{-- Welcome Text --}}
-        <!-- <div class="relative z-10 my-8 max-w-[15rem]">
-            <h2 class="text-2xl font-extrabold leading-tight text-gray-800">
-                Welcome <span class="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-rose-900">Back!</span>
-            </h2>
-            <p class="mt-3 text-sm leading-relaxed text-gray-500">
-                Sign in to access the AISS Central Dashboard and monitor your production line in real time.
-            </p>
-        </div> -->
-
         {{-- Footer --}}
         <div class="relative z-10">
             <p class="text-xs text-gray-400 tracking-wide">
@@ -27,35 +15,35 @@
             </p>
         </div>
     </div>
-
     {{-- Right Panel: Login Form --}}
     <div class="flex-1 bg-white flex items-center justify-center px-8 sm:px-10 py-10">
         <form id="login-form" method="POST" action="{{ route('login') }}" class="w-full max-w-sm space-y-5">
             @csrf
             {{-- Header --}}
             <div class="pb-1">
-                <h1 class="text-2xl font-extrabold text-slate-400 uppercase">
-                    AISS
+                <h1 class="text-sm font-semibold text-slate-400 uppercase">
+                    AISS Central Dashboard
                 </h1>
-                <h1 class="text-2xl font-extrabold text-slate-700 uppercase">
-                    Central Dashboard
+                <h1 class="text-3xl font-extrabold text-slate-700 mb-4">
+                    Welcome Back!
                 </h1>
-                <p class="text-sm text-gray-400 mt-1">Enter your NPK and password to continue</p>
+                <p class="text-sm text-gray-400">Please enter your details</p>
             </div>
             {{-- NPK --}}
             <div>
                 <label for="npk" class="block mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">NPK</label>
                 <div class="relative group">
                     <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-                        <svg class="w-5 h-5 text-gray-400 group-focus-within:text-red-500 transition-colors"
-                             fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        <svg class="w-5 h-5 text-gray-400 group-focus-within:text-red-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
                     </div>
-                    <input type="text" name="npk" id="npk"
-                        class="bg-gray-50 border border-gray-200 text-gray-900 rounded-full focus:ring-2 focus:ring-red-500/30 focus:border-red-500 block w-full pl-11 p-3.5 transition-all duration-200 placeholder-zinc-300 font-medium"
-                        placeholder="219XXXX" required>
+                    <input class="bg-gray-50 border border-gray-200 text-gray-900 rounded-full focus:ring-2 focus:ring-red-500/30 focus:border-red-500 block w-full pl-11 p-3.5 transition-all duration-200 placeholder-zinc-300 font-medium"
+                        type="text"
+                        name="npk"
+                        id="npk"
+                        placeholder="219XXXX"
+                        required>
                 </div>
             </div>
             {{-- Password --}}
@@ -63,34 +51,35 @@
                 <label for="password" class="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2">Password</label>
                 <div class="relative group">
                     <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-                        <svg class="w-5 h-5 text-gray-400 group-focus-within:text-red-500 transition-colors"
-                             fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        <svg class="w-5 h-5 text-gray-400 group-focus-within:text-red-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                         </svg>
                     </div>
-                    <input type="password" name="password" id="password"
-                        class="bg-gray-50 border border-gray-200 text-gray-900 rounded-full focus:ring-2 focus:ring-red-500/30 focus:border-red-500 block w-full pl-11 p-3.5 transition-all duration-200 placeholder-zinc-300 font-medium tracking-widest"
-                        placeholder="••••••••" required>
+                    <input class="bg-gray-50 border border-gray-200 text-gray-900 rounded-full focus:ring-2 focus:ring-red-500/30 focus:border-red-500 block w-full pl-11 p-3.5 transition-all duration-200 placeholder-zinc-300 font-medium tracking-widest"
+                        type="password"
+                        name="password"
+                        id="password"
+                        placeholder="••••••••"
+                        required>
                 </div>
             </div>
             {{-- Remember me --}}
-            <div class="flex items-center">
+            <!-- <div class="flex items-center">
                 <label for="remember" class="flex items-center gap-2 text-sm text-gray-500 select-none cursor-pointer">
                     <input type="checkbox" name="remember" id="remember"
                         class="rounded border-gray-300 text-red-600 focus:ring-red-500/30">
                     Remember me
                 </label>
-            </div>
+            </div> -->
             {{-- Submit --}}
-            <button type="submit" id="login-submit-btn"
-                class="w-full text-white bg-gradient-to-r from-red-600 to-rose-900 hover:from-red-700 hover:to-rose-950 focus:ring-4 focus:outline-none focus:ring-red-300 font-bold rounded-full text-md px-5 py-3.5 text-center transform transition-all active:scale-[0.98] shadow-lg shadow-red-500/30 disabled:opacity-60 disabled:cursor-not-allowed">
+            <button class="w-full text-white bg-gradient-to-r from-red-600 to-rose-900 hover:from-red-700 hover:to-rose-950 focus:ring-4 focus:outline-none focus:ring-red-300 font-bold rounded-full text-md px-5 py-3.5 text-center transform transition-all active:scale-[0.98] shadow-lg shadow-red-500/30 disabled:opacity-60 disabled:cursor-not-allowed"
+                type="submit"
+                id="login-submit-btn">
                 <span id="login-submit-label">Sign In</span>
             </button>
         </form>
     </div>
 </div>
-
 <script>
     (function () {
         const form = document.getElementById('login-form');

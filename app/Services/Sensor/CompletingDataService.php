@@ -99,13 +99,13 @@ class CompletingDataService
                 $diff = $prev->diffInSeconds($curr);
 
                 // Proteksi gap
-                if ($diff > ($limit['ucl'] * 3)) {
+                $cycle = (int) $sensor->pivot->cycle;
+
+                if ($diff > ($limit['ucl'] * $cycle * 3)) {
                     continue;
                 }
 
-                $duration = $sensor->halve_duration
-                    ? intdiv($diff, 2)
-                    : $diff;
+                $duration = $diff / $cycle;
 
                 $status = ($duration < $limit['lcl'] || $duration > $limit['ucl']) ? 0 : 1;
 
@@ -121,6 +121,7 @@ class CompletingDataService
                     'sensor_id'  => $sensor->id,
                     'history_id' => $histories[$i]->id,
                     'duration'   => $duration,
+                    'cycle'      => $cycle,
                     'status'     => $status,
                 ]);
             }

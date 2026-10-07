@@ -21,9 +21,9 @@ return new class extends Migration
                   ->onDelete('cascade')
                   ->nullable();
             $table->foreignId('pattern_id')
+                  ->nullable()
                   ->constrained()
-                  ->onDelete('cascade')
-                  ->nullable(); 
+                  ->onDelete('cascade'); 
             $table->foreignId('sensor_id')
                   ->constrained()
                   ->onDelete('cascade')

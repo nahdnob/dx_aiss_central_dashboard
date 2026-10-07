@@ -20,6 +20,7 @@ return new class extends Migration
                   ->constrained('sensors')
                   ->onDelete('cascade');
             $table->unsignedInteger('pos');
+            $table->unsignedInteger('cycle');
             $table->timestamps();
         });
     }
