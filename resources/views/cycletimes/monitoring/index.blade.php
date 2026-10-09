@@ -1,8 +1,10 @@
 @extends('layouts.system-manager')
 
+@push('head')
+    <meta http-equiv="refresh" content="60">
+@endpush
+
 @section('content')
-
-
 <div class="p-4 sm:ml-16 mt-14 transition-all duration-300">
     <div class="p-4 min-h-[calc(100vh-5rem)]">
 
@@ -462,10 +464,24 @@
             const scatterMaxTime = {{ $filterPattern?->max_time ?? 0 }};
             const scatterMinTime = {{ $filterPattern?->min_time ?? 0 }};
             const scatterLabels = scatterRaw.map(d => d.x);
-            const scatterPoints = scatterRaw.map((d, i) => ({ x: i, y: d.y }));
+            const scatterPoints = scatterRaw.map((d, i) => ({ x: i, y: Number(d.y) }));
             const scatterColors = scatterRaw.map(d => d.status == 1
-                ? 'rgba(34,197,94,0.85)'
-                : 'rgba(239,68,68,0.85)');
+                ? 'rgba(34,197,94,0.65)'
+                : 'rgba(239,68,68,0.75)');
+
+            // ── Moving Average ──
+            const MA_WINDOW = 30; // jumlah titik per rata-rata, ubah sesuai kebutuhan
+
+            function movingAverage(values, windowSize) {
+                return values.map((_, i) => {
+                    const start = Math.max(0, i - windowSize + 1);
+                    const slice = values.slice(start, i + 1);
+                    return slice.reduce((a, b) => a + b, 0) / slice.length;
+                });
+            }
+
+            const maValues = movingAverage(scatterPoints.map(p => p.y), MA_WINDOW);
+            const maPoints = maValues.map((y, i) => ({ x: i, y }));
 
             new CdnChart(scatterCtx, {
                 type: 'scatter',
@@ -474,8 +490,21 @@
                         label: 'Cycle Time',
                         data: scatterPoints,
                         backgroundColor: scatterColors,
-                        pointRadius: 3,
+                        pointRadius: 2,
                         pointHoverRadius: 5,
+                        order: 2,
+                    },
+                    {
+                    type: 'line',
+                    label: 'MA ' + MA_WINDOW,
+                    data: maPoints,
+                    borderColor: 'rgba(59,130,246,0.95)', // biru
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    pointHoverRadius: 0,
+                    tension: 0.3,
+                    fill: false,
+                    order: 0,
                     }]
                 },
                 options: {
@@ -512,6 +541,9 @@
                             callbacks: {
                                 title: items => scatterLabels[items[0].parsed.x] ?? '',
                                 label: item => {
+                                    if (item.datasetIndex === 1) {
+                                        return ` MA ${MA_WINDOW}: ${item.parsed.y.toFixed(2)}s`;
+                                    }
                                     const d = scatterRaw[item.parsed.x];
                                     return ` ${d.sensor} · ${item.parsed.y.toFixed(2)}s  ${item.parsed.y > scatterScl ? '⚠ Abnormal' : '✓ Normal'}`;
                                 }
