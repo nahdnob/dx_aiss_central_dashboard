@@ -60,7 +60,7 @@
                     {{-- Title and Description --}}
                     <div>
                         <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Total QTY In</p>
-                        <p class="text-2xl font-extrabold text-gray-900">{{ $products->sum('quantity') ?? 0 }}</p>
+                        <p class="text-2xl font-extrabold text-gray-900">{{ $products->sum('qty_in') ?? 0 }}</p>
                     </div>
                 </div>
             </div>
@@ -124,7 +124,7 @@
                         @forelse ($products as $item)
                             @php
                                 $timeIn  = $item->firstProductIn['time_in'] ?? null;
-                                $timeOut = $item->lastProductIn->productOut->time_out ?? null;
+                                $timeOut = (int) $item->id === (int) $runningId ? null : $item->last_time_out;
                                 $qtyIn   = $item->qty_in ?? 0;
                                 $qtyOut  = $item->qty_out ?? 0;
                                 $flowPct = $qtyIn > 0 ? round(($qtyOut / $qtyIn) * 100, 1) : 0;

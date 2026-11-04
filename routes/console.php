@@ -13,25 +13,25 @@ Artisan::command('inspire', function () {
 // 1. Product In Sync
 Schedule::command('app:sync-product-in')
         ->everyMinute()
-        ->withoutOverlapping()
+        ->withoutOverlapping(10)
         ->runInBackground();
 
 // 2. Product Out Sync`
 Schedule::command('app:sync-product-out')
         ->everyMinute()
-        ->withoutOverlapping()
+        ->withoutOverlapping(10)
         ->runInBackground();
 
 // 3. Completing Data Sync
 Schedule::command('sensor:complete-data')
         ->everyMinute()
-        ->withoutOverlapping()
+        ->withoutOverlapping(10)
         ->onOneServer()
         ->runInBackground();
 
 // 4. Summary Data Sync
 Schedule::command('sensor:summary-data')
         ->everyMinute()
-        ->withoutOverlapping()
+        ->withoutOverlapping(10)
         ->onOneServer()
         ->runInBackground();

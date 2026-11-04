@@ -106,8 +106,6 @@ class ProductInService
 
         $data = file($filePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 
-        $updatedParts = [];
-
         for ($i = $startIndex; $i < count($data); $i++) {
 
             $parsed = $this->parseLine($data[$i]);
@@ -117,14 +115,9 @@ class ProductInService
                 $product = $this->save($line, $currentDate, $parsed);
 
                 if ($product) {
-                    $updatedParts[] = $product->part_number;
+                    $this->summaryService->updateSummary($product);
                 }
             }
-        }
-
-        // update summary hanya sekali per part_number
-        foreach (array_unique($updatedParts) as $partNumber) {
-            $this->summaryService->updateSummary($line->id, $partNumber);
         }
     }
 
@@ -171,13 +164,13 @@ class ProductInService
 
         return ProductIn::firstOrCreate(
             [
-                'part_id'     => $parsed['partId'],
-                'part_number' => $parsed['partNumber'],
-                'time_in'     => $dateTimeIn,
+                'line_id' => $line->id,
+                'part_id' => $parsed['partId'],
             ],
             [
-                'quantity' => $quantity,
-                'line_id'  => $line->id,
+                'part_number' => $parsed['partNumber'],
+                'time_in'     => $dateTimeIn,
+                'quantity'    => $quantity,
             ]
         );
     }

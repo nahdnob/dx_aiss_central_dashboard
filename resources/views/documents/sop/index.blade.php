@@ -248,102 +248,116 @@
                         @endforelse
                     </tbody>
                 </table>
-
                 @foreach($sops as $item)
                     @php
                         $connectedDasgIds = $item->dasgs->pluck('id')->toArray();
+                        $hasErr = (string) old('_edit_id') === (string) $item->id;
+                        $err = fn ($field) => $hasErr ? $errors->first($field) : null;
+                        $base = 'w-full border rounded-lg px-3 py-2.5 text-sm text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent transition';
+                        $label = 'block text-xs font-bold tracking-wide text-gray-500 uppercase mb-1.5';
                     @endphp
+
                     <x-ui.modal id="edit-sop-modal-{{ $item->id }}">
                         <div class="w-full bg-white rounded-2xl shadow-2xl flex flex-col" style="width: 860px; max-width: 95vw; max-height: 90vh;">
 
-                            {{-- Modal Header --}}
-                            <div class="flex items-center gap-3 px-6 py-4 border-b border-gray-100 bg-white shrink-0 rounded-t-2xl">
-                                <div class="flex items-center justify-center w-9 h-9 rounded-xl shrink-0">
-                                    <svg class="text-red-600 w-80 h-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            {{-- Header --}}
+                            <div class="flex items-center gap-3 px-6 py-4 border-b border-gray-100 shrink-0 rounded-t-2xl">
+                                <div class="flex items-center justify-center w-9 h-9 rounded-xl bg-sky-50 shrink-0">
+                                    <svg class="w-5 h-5 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                     </svg>
                                 </div>
                                 <div class="flex-1 min-w-0">
-                                    <h3 class="text-xl font-bold text-gray-900 leading-tight uppercase">Edit</h3>
-                                    <p class="text-xs text-gray-400 mt-0.5">Update the SOP details below and save changes.</p>
+                                    <h3 class="text-xl font-bold text-gray-900 leading-tight uppercase">Edit SOP</h3>
+                                    <p class="text-xs text-gray-500 mt-0.5">Update the SOP details below. Fields marked <span class="text-red-500">*</span> are required.</p>
                                 </div>
                                 <button type="button" data-modal-close="edit-sop-modal-{{ $item->id }}"
+                                    aria-label="Close dialog" title="Close (Esc)"
                                     class="flex items-center justify-center w-8 h-8 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition shrink-0">
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                                         <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
                                     </svg>
                                 </button>
                             </div>
 
-                            {{-- Modal Body --}}
-                            <form action="{{ route('sops.update', $item->id) }}" method="POST" enctype="multipart/form-data" class="flex flex-col flex-1 overflow-hidden">
+                            {{-- Form --}}
+                            <form action="{{ route('sops.update', $item->id) }}" method="POST" enctype="multipart/form-data"
+                                class="edit-sop-form flex flex-col flex-1 overflow-hidden" novalidate>
                                 @csrf
                                 @method('PUT')
+                                <input type="hidden" name="_edit_id" value="{{ $item->id }}">
 
-                                <div class="flex flex-1 overflow-hidden">
+                                <div class="flex flex-col md:flex-row flex-1 overflow-y-auto md:overflow-hidden">
 
-                                    {{-- ===== KOLOM KIRI: Form Fields ===== --}}
-                                    <div class="w-96 shrink-0 px-6 py-5 space-y-4 overflow-y-auto border-r border-gray-100">
+                                    {{-- Left: fields --}}
+                                    <div class="w-full md:w-96 shrink-0 px-6 py-5 space-y-4 md:overflow-y-auto md:border-r border-gray-100">
 
                                         {{-- Document Name --}}
                                         <div>
-                                            <label for="edit_name_{{ $item->id }}" class="block text-[10px] font-bold tracking-widest text-gray-400 uppercase mb-1.5">Document Name</label>
-                                            <input
-                                                type="text"
-                                                name="name"
-                                                id="edit_name_{{ $item->id }}"
-                                                value="{{ $item->name }}"
-                                                required
-                                                class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent transition"
+                                            <label for="edit_name_{{ $item->id }}" class="{{ $label }}">Document Name <span class="text-red-500">*</span></label>
+                                            <input type="text" name="name" id="edit_name_{{ $item->id }}"
+                                                value="{{ $hasErr ? old('name') : $item->name }}"
                                                 placeholder="Enter document name"
-                                            />
+                                                maxlength="255" required autofocus
+                                                aria-invalid="{{ $err('name') ? 'true' : 'false' }}"
+                                                class="{{ $base }} {{ $err('name') ? 'border-red-400' : 'border-gray-200' }}">
+                                            @if($err('name'))
+                                                <p class="mt-1 text-xs text-red-600" role="alert">{{ $err('name') }}</p>
+                                            @endif
                                         </div>
 
                                         {{-- SOP No + Revision --}}
                                         <div class="grid grid-cols-2 gap-3">
                                             <div>
-                                                <label for="edit_sop_no_{{ $item->id }}" class="block text-[10px] font-bold tracking-widest text-gray-400 uppercase mb-1.5">SOP No</label>
-                                                <input
-                                                    type="text"
-                                                    name="sop_no"
-                                                    id="edit_sop_no_{{ $item->id }}"
-                                                    value="{{ $item->sop_no }}"
-                                                    class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent transition"
-                                                    placeholder="e.g. SOP-001"
-                                                />
+                                                <label for="edit_sop_no_{{ $item->id }}" class="{{ $label }}">SOP No</label>
+                                                <input type="text" name="sop_no" id="edit_sop_no_{{ $item->id }}"
+                                                    value="{{ $hasErr ? old('sop_no') : $item->sop_no }}"
+                                                    placeholder="e.g. SOP-001" maxlength="50"
+                                                    class="{{ $base }} {{ $err('sop_no') ? 'border-red-400' : 'border-gray-200' }}">
+                                                @if($err('sop_no'))
+                                                    <p class="mt-1 text-xs text-red-600" role="alert">{{ $err('sop_no') }}</p>
+                                                @endif
                                             </div>
                                             <div>
-                                                <label for="edit_revision_{{ $item->id }}" class="block text-[10px] font-bold tracking-widest text-gray-400 uppercase mb-1.5">Revision</label>
-                                                <input
-                                                    type="number"
-                                                    name="revision"
-                                                    id="edit_revision_{{ $item->id }}"
-                                                    value="{{ $item->revision }}"
-                                                    min="1"
-                                                    required
-                                                    class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent transition"
-                                                />
+                                                <label for="edit_revision_{{ $item->id }}" class="{{ $label }}">Revision <span class="text-red-500">*</span></label>
+                                                <input type="number" name="revision" id="edit_revision_{{ $item->id }}"
+                                                    value="{{ $hasErr ? old('revision') : $item->revision }}"
+                                                    min="1" required
+                                                    class="{{ $base }} {{ $err('revision') ? 'border-red-400' : 'border-gray-200' }}">
+                                                @if($err('revision'))
+                                                    <p class="mt-1 text-xs text-red-600" role="alert">{{ $err('revision') }}</p>
+                                                @endif
                                             </div>
                                         </div>
 
                                         {{-- SOP File --}}
                                         <div>
-                                            <label class="block text-[10px] font-bold tracking-widest text-gray-400 uppercase mb-1.5">SOP File</label>
-                                            <div class="flex items-center gap-2 border border-gray-200 rounded-lg px-1.5 py-1.5 bg-gray-50 hover:border-gray-300 transition">
+                                            <label class="{{ $label }}">SOP File</label>
+                                            <div class="flex items-center gap-2 border rounded-lg px-1.5 py-1.5 bg-gray-50 hover:border-gray-300 transition {{ $err('sop_file') ? 'border-red-400' : 'border-gray-200' }}">
                                                 <button type="button"
-                                                    class="edit-file-btn shrink-0 px-4 py-1.5 bg-white border border-gray-200 text-gray-700 font-semibold text-xs rounded-lg transition whitespace-nowrap shadow-sm">
+                                                    class="edit-file-btn shrink-0 px-4 py-1.5 bg-white border border-gray-200 text-gray-700 font-semibold text-xs rounded-lg transition whitespace-nowrap shadow-sm hover:bg-gray-100">
                                                     Browse File
                                                 </button>
-                                                <span class="edit-file-name text-sm text-gray-500 flex-1 truncate">
+                                                <span class="edit-file-name text-sm text-gray-500 flex-1 truncate"
+                                                    title="{{ $item->link ? basename($item->link) : '' }}">
                                                     {{ $item->link ? basename($item->link) : 'No file selected' }}
                                                 </span>
-                                                <input type="file" name="sop_file" class="edit-file-input hidden" accept=".pdf,.doc,.docx,.xlsx,.xls,.ppt,.pptx">
+                                                <input type="file" name="sop_file" class="edit-file-input hidden"
+                                                    accept=".pdf,.doc,.docx,.xlsx,.xls,.ppt,.pptx" data-max-mb="10">
                                             </div>
+                                            <p class="mt-1 text-xs text-gray-400">
+                                                PDF, Word, Excel, or PowerPoint · max 10 MB. Leave empty to keep the current file.
+                                                @if($item->link)
+                                                    <a href="{{ asset('storage/' . $item->link) }}" target="_blank" rel="noopener"
+                                                    class="text-sky-600 hover:underline">View current file</a>
+                                                @endif
+                                            </p>
+                                            <p class="edit-file-error mt-1 text-xs text-red-600 {{ $err('sop_file') ? '' : 'hidden' }}" role="alert">{{ $err('sop_file') }}</p>
                                         </div>
 
                                         {{-- Risk Assessment --}}
                                         <div>
-                                            <label class="block text-[10px] font-bold tracking-widest text-gray-400 uppercase mb-1.5">Risk Assessment</label>
+                                            <label class="{{ $label }}">Risk Assessment</label>
                                             <x-ui.searchable-dropdown
                                                 :id="'ra-edit-' . $item->id"
                                                 name="ra_id"
@@ -351,12 +365,10 @@
                                                 search-placeholder="Search RA..."
                                                 :selected-value="$item->activeRiskAssessment->id ?? ''"
                                                 :selected-label="$item->activeRiskAssessment ? $item->activeRiskAssessment->ra_no . ' – ' . $item->activeRiskAssessment->name : null"
-                                                :required="false"
-                                            >
+                                                :required="false">
                                                 <li>
-                                                    <a href="#"
-                                                    class="dropdown-option flex flex-col px-3 py-2 rounded-lg cursor-pointer hover:bg-gray-100 transition"
-                                                    data-id="" data-value="">
+                                                    <a class="dropdown-option flex flex-col px-3 py-2 rounded-lg cursor-pointer hover:bg-gray-100 transition"
+                                                    href="#" data-id="" data-value="">
                                                         <span class="text-gray-400 italic text-sm">— No selection —</span>
                                                     </a>
                                                 </li>
@@ -372,12 +384,12 @@
                                                     </li>
                                                 @endforeach
                                             </x-ui.searchable-dropdown>
-                                        </div> 
+                                            <p class="mt-1 text-xs text-gray-400">Optional. Link this SOP to its active risk assessment.</p>
+                                        </div>
+                                    </div>
 
-                                    </div>{{-- end kolom kiri --}}
-
-                                    {{-- ===== KOLOM KANAN: DASG Connection ===== --}}
-                                    <div class="flex-1 shrink-0 h-[350px] px-5 py-5 flex flex-col overflow-hidden">
+                                    {{-- Right: DASG --}}
+                                    <div class="flex-1 min-h-[260px] md:min-h-0 px-5 py-5 flex flex-col overflow-hidden">
                                         <x-ui.toggle-list
                                             :item-id="$item->id"
                                             :items="$dasgs"
@@ -386,29 +398,66 @@
                                             label="DASG Connection"
                                             search-placeholder="Search DASG..."
                                             name-key="name"
-                                            sub-key="detail_standard"
-                                        />
-                                    </div>{{-- end kolom kanan --}}
+                                            sub-key="detail_standard"/>
+                                    </div>
+                                </div>
 
-                                </div>{{-- end flex body --}}
-
-                                {{-- Modal Footer --}}
+                                {{-- Footer --}}
                                 <div class="flex items-center justify-end gap-2 px-6 py-4 bg-gray-50 border-t border-gray-100 shrink-0 rounded-b-2xl">
                                     <button type="button" data-modal-close="edit-sop-modal-{{ $item->id }}"
                                         class="px-4 py-2 text-sm font-semibold text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 transition">
                                         Cancel
                                     </button>
                                     <button type="submit"
-                                        class="px-5 py-2 text-sm font-bold text-white bg-gradient-to-r from-sky-500 to-sky-600 rounded-lg hover:brightness-110 shadow-sm transition uppercase">
-                                        Save
+                                        class="edit-submit-btn inline-flex items-center gap-2 px-5 py-2 text-sm font-bold text-white bg-gradient-to-r from-sky-500 to-sky-600 rounded-lg hover:brightness-110 shadow-sm transition disabled:opacity-60 disabled:cursor-not-allowed">
+                                        <svg class="edit-spinner hidden w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                                        </svg>
+                                        <span class="edit-submit-label">Save Changes</span>
                                     </button>
                                 </div>
                             </form>
-
                         </div>
                     </x-ui.modal>
                 @endforeach
+                @once
+                <script>
+                document.addEventListener('change', e => {
+                    const input = e.target.closest('.edit-file-input');
+                    if (!input) return;
+                    const wrap  = input.closest('div');
+                    const label = wrap.querySelector('.edit-file-name');
+                    const error = wrap.parentElement.querySelector('.edit-file-error');
+                    const file  = input.files[0];
+                    const maxMb = Number(input.dataset.maxMb || 10);
 
+                    if (file && file.size > maxMb * 1024 * 1024) {
+                        error.textContent = `File is too large (max ${maxMb} MB).`;
+                        error.classList.remove('hidden');
+                        input.value = '';
+                        return;
+                    }
+                    error.classList.add('hidden');
+                    if (file) { label.textContent = file.name; label.title = file.name; }
+                });
+
+                document.addEventListener('submit', e => {
+                    const form = e.target.closest('.edit-sop-form');
+                    if (!form) return;
+                    if (!form.checkValidity()) { e.preventDefault(); form.reportValidity(); return; }
+                    const btn = form.querySelector('.edit-submit-btn');
+                    btn.disabled = true;
+                    btn.querySelector('.edit-spinner').classList.remove('hidden');
+                    btn.querySelector('.edit-submit-label').textContent = 'Saving...';
+                });
+                document.addEventListener('click', e => {
+                    const btn = e.target.closest('.edit-file-btn');
+                    if (!btn) return;
+                    btn.closest('div').querySelector('.edit-file-input').click();
+                });
+                </script>
+                @endonce
                 {{-- Pagination --}}
                 <div class="flex items-center justify-between px-5 py-3 border-t border-gray-100">
                     <p class="text-xs text-slate-400 font-medium">

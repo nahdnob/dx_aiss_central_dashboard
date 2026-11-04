@@ -14,6 +14,7 @@ use Carbon\Carbon;
 
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Collection;
 
 class ProductOutService
 {
@@ -53,7 +54,7 @@ class ProductOutService
 
         $today    = now();
         $now      = $today->format('H:i:s');
-        $lastData = ProductOut::where('line_id', $line->id)->latest()->first();
+        $lastData = ProductOut::where('line_id', $line->id)->orderByDesc('id')->first();
 
         if ($lastData === null) {
 
@@ -192,28 +193,33 @@ class ProductOutService
         }
 
         $count = 0;
-        $updatedParts = [];
+        $affected = collect();
 
-        for ($i = $startIndex; $i < count($data); $i++) {
+        try {
+            for ($i = $startIndex; $i < count($data); $i++) {
 
-            $parsed = $this->parseLine($data[$i]);
+                $parsed = $this->parseLine($data[$i]);
 
-            if (!$parsed) {
-                continue;
-            }
-
-            if ($parsed['judgement'] === 'OK') {
-
-                if ($this->save($line, $currentDate, $parsed)) {
-                    $count++;
-                    $updatedParts[] = $parsed['partNumber'];
+                if (!$parsed || $parsed['judgement'] !== 'OK') {
+                    continue;
                 }
+
+                $changed = $this->save($line, $currentDate, $parsed);
+
+                if ($changed !== null) {
+                    $count++;
+                    $affected = $affected->merge($changed);
+                }
+            }
+        } finally {
+            foreach ($affected->unique('id')->sortBy('id') as $in) {
+                $this->summaryService->updateSummary($in);
             }
         }
 
-        // update summary hanya sekali per part_number
-        foreach (array_unique($updatedParts) as $partNumber) {
-            $this->summaryService->updateSummary($line->id, $partNumber);
+        // satu kali per ProductIn, berurutan
+        foreach ($affected->unique('id')->sortBy('id') as $in) {
+            $this->summaryService->updateSummary($in);
         }
 
         return $count;
@@ -238,10 +244,10 @@ class ProductOutService
         ];
     }
 
-    private function save(Line $line, $currentDate, array $parsed): bool
+    private function save(Line $line, $currentDate, array $parsed): ?Collection
     {
         if (empty($parsed['tagId']) || empty($parsed['partNumber']) || empty($parsed['timeOut'])) {
-            return false;
+            return null;
         }
 
         $parsed['timeOut'] = date('H:i:s', strtotime($parsed['timeOut']));
@@ -268,13 +274,10 @@ class ProductOutService
         );
 
         if (!$productOut->wasRecentlyCreated) {
-            return false;
+            return null;
         }
 
-        // FIFO sementara tetap di sini
-        $this->fifoService->process($productOut);
-
-        return true;
+        return $this->fifoService->process($productOut);
     }
 
     private function calibrate(Line $line, $lastData, string $lastDate, string $nowDate): int {

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Sop;
+use App\Models\Line;
 
 class Machine extends Model
 {
@@ -20,16 +21,16 @@ class Machine extends Model
         'line_id',
     ];
 
-    public function line()
-    {
-        return $this->belongsTo(\App\Models\Line::class);
-    }
-
     protected function casts(): array {
         
         return [
             'acquisition_date' => 'date',
         ];
+    }
+
+    public function line()
+    {
+        return $this->belongsTo(Line::class);
     }
 
     public function sops()

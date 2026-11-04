@@ -27,7 +27,7 @@ class DasgController extends Controller
             });
         }
 
-        $dasgs = $query->orderBy('created_at', 'desc')->paginate(6);
+        $dasgs = $query->orderBy('created_at', 'desc')->paginate(15);
         $lines = Line::orderBy('name')->get();
 
         return view('documents.dasg.index', compact('dasgs', 'lines'));
@@ -60,11 +60,11 @@ class DasgController extends Controller
     public function update(Request $request, Dasg $dasg)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name'            => 'required|string|max:255',
             'detail_standard' => 'nullable|string',
-            'revision' => 'required|integer|min:1',
-            'line_id'  => 'nullable|integer|exists:lines,id',
-            'dasg_file' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx|max:10240',
+            'revision'        => 'required|integer|min:1',
+            'line_id'         => 'nullable|integer|exists:lines,id',
+            'dasg_file'       => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx|max:10240',
         ]);
 
         if ($request->hasFile('dasg_file')) {

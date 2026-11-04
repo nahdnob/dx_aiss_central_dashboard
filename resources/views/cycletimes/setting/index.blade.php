@@ -3,7 +3,6 @@
 @section('content')
 <div x-data="{ isAddModalOpen: false, editModalOpen: null }" class="p-4 sm:ml-16 mt-14 transition-all duration-300">
     <div class="p-4 min-h-[calc(100vh-5rem)]">
-
         {{-- ===== HERO HEADER ===== --}}
         <div class="group relative bg-white rounded-2xl border border-gray-200 shadow-sm mb-6 overflow-hidden">
             {{-- Settings Image --}}
@@ -26,33 +25,7 @@
                 </p>
             </div>
         </div>
-
-        {{-- ===== SYSTEM MESSAGES ===== --}}
-        @if ($errors->any())
-            <div x-data="{ show: true }" x-show="show" x-transition class="mb-5 bg-red-50 border-l-4 border-red-500 p-4 rounded-r-xl shadow-sm relative">
-                <button @click="show = false" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition-colors">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-                <div class="flex items-start">
-                    <div class="flex-shrink-0">
-                        <svg class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                        </svg>
-                    </div>
-                    <div class="ml-3">
-                        <h3 class="text-sm font-bold text-red-800">Terdapat kesalahan pengisian form:</h3>
-                        <div class="mt-1 text-sm text-red-700">
-                            <ul class="list-disc pl-5 space-y-1">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        @endif
-
+        {{-- ===== SUCCESS ALERT ===== --}}
         @if (session('success'))
             <div x-data="{ show: true }" x-show="show" x-transition class="mb-5 bg-green-50 border-l-4 border-green-500 p-4 rounded-r-xl shadow-sm relative">
                 <button @click="show = false" class="absolute top-4 right-4 text-gray-400 hover:text-green-600 transition-colors">
@@ -70,7 +43,6 @@
                 </div>
             </div>
         @endif
-
         {{-- ===== SENSOR MAPPING PLACEHOLDER ===== --}}
         <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mb-8">
             <div class="flex items-center justify-between mb-4">
@@ -88,7 +60,6 @@
                     </button>
                 </form>
             </div>
-            
             <div class="w-full min-h-[300px] bg-gray-50 rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center text-gray-400 group hover:border-red-300 hover:bg-red-50/30 transition-all cursor-pointer overflow-hidden relative" onclick="document.getElementById('map_image_input').click()">
                 @if(file_exists(public_path('img/sensor-mapping.png')))
                     <img src="{{ asset('img/sensor-mapping.png') }}?v={{ time() }}" class="w-full h-auto object-contain p-2" alt="Sensor Map">
@@ -107,7 +78,6 @@
                 @endif
             </div>
         </div>
-
         {{-- ===== DATA TABLE & ACTION ===== --}}
         <div>
             <div class="flex items-end justify-between mb-3">
@@ -124,7 +94,6 @@
                     </button>
                 </div>
             </div>
-
             <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
                 {{-- Search bar --}}
                 <div class="p-4 border-b border-gray-100">
@@ -141,7 +110,6 @@
                         </div>
                     </form>
                 </div>
-
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm text-left">
                         <thead>
@@ -165,7 +133,6 @@
                                             {{ $pattern->name }}
                                         </div>
                                     </td>
-                                    
                                     {{-- Sensors --}}
                                     @foreach ($sensors as $sensor)
                                         @php
@@ -188,7 +155,6 @@
                                             @endif
                                         </td>
                                     @endforeach
-
                                     {{-- Timing --}}
                                     <td class="px-5 py-4 text-center font-mono text-gray-700 bg-gray-50/30">
                                         {{ $pattern->cycle_time }}<span class="text-xs text-gray-400">s</span>
@@ -198,7 +164,6 @@
                                         <span class="mx-1 text-gray-300">—</span>
                                         <span class="font-mono text-gray-700">{{ $pattern->max_time }}</span>s
                                     </td>
-
                                     {{-- Actions --}}
                                     <td class="px-5 py-4">
                                         <div class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
@@ -237,28 +202,33 @@
                         </tbody>
                     </table>
                 </div>
-
             </div>
         </div>
-
     </div>
-
     {{-- ===== ADD PATTERN MODAL ===== --}}
-    <div x-show="isAddModalOpen" style="display: none"
-         class="fixed inset-0 z-50 overflow-y-auto"
-         aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="fixed inset-0 z-50 overflow-y-auto"
+        x-show="isAddModalOpen"
+        style="display: none"
+        aria-labelledby="modal-title"
+        role="dialog"
+        aria-modal="true">
+        
         <div class="flex items-end justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
             <!-- Background overlay -->
-            <div x-show="isAddModalOpen" x-transition.opacity
-                 class="fixed inset-0 transition-opacity bg-gray-900/60 backdrop-blur-sm" aria-hidden="true" @click="isAddModalOpen = false"></div>
+            <div class="fixed inset-0 transition-opacity bg-gray-900/60 backdrop-blur-sm" aria-hidden="true" @click="isAddModalOpen = false"
+                x-show="isAddModalOpen"
+                x-transition.opacity></div>
 
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-
             <!-- Modal panel -->
-            <div x-show="isAddModalOpen"
-                 x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-                 x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                 class="inline-block px-1 pt-1 pb-4 overflow-hidden text-left align-bottom transition-all transform bg-white rounded-2xl shadow-2xl sm:my-8 sm:align-middle sm:max-w-xl sm:w-full sm:p-6 border border-gray-100">
+            <div class="inline-block px-1 pt-1 pb-4 overflow-hidden text-left align-bottom transition-all transform bg-white rounded-2xl shadow-2xl sm:my-8 sm:align-middle sm:max-w-xl sm:w-full sm:p-6 border border-gray-100"
+                x-show="isAddModalOpen"
+                x-transition:enter="ease-out duration-300"
+                x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave="ease-in duration-200"
+                x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
                 
                 <form action="{{ route('cycletimes.setting.store') }}" method="POST">
                     @csrf
@@ -328,89 +298,139 @@
     {{-- ===== EDIT PATTERN MODALS ===== --}}
     @foreach($patterns as $pattern)
     <div x-show="editModalOpen === {{ $pattern->id }}" style="display: none"
-         class="fixed inset-0 z-50 overflow-y-auto"
-         aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <div class="flex items-end justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-            <!-- Background overlay -->
-            <div x-show="editModalOpen === {{ $pattern->id }}" x-transition.opacity
-                 class="fixed inset-0 transition-opacity bg-gray-900/60 backdrop-blur-sm" aria-hidden="true" @click="editModalOpen = null"></div>
+        @keydown.escape.window="editModalOpen = null"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4"
+        role="dialog" aria-modal="true" aria-labelledby="edit-title-{{ $pattern->id }}">
 
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        {{-- Overlay --}}
+        <div x-show="editModalOpen === {{ $pattern->id }}" x-transition.opacity
+            class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm"
+            @click="editModalOpen = null" aria-hidden="true"></div>
 
-            <!-- Modal panel -->
-            <div x-show="editModalOpen === {{ $pattern->id }}"
-                 x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-                 x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                 class="inline-block px-1 pt-1 pb-4 overflow-hidden text-left align-bottom transition-all transform bg-white rounded-2xl shadow-2xl sm:my-8 sm:align-middle sm:max-w-xl sm:w-full sm:p-6 border border-gray-100">
-                
-                <form action="{{ route('cycletimes.setting.update', $pattern->id) }}" method="POST">
-                    @csrf
-                    @method('PUT')
-                    <div class="sm:flex sm:items-start">
-                        <div class="flex items-center justify-center flex-shrink-0 w-12 h-12 mx-auto bg-sky-100 rounded-full sm:mx-0 sm:h-10 sm:w-10">
-                            <svg class="w-5 h-5 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+        {{-- Panel --}}
+        <div x-show="editModalOpen === {{ $pattern->id }}"
+            x-transition:enter="ease-out duration-200"
+            x-transition:enter-start="opacity-0 translate-y-4 sm:scale-95"
+            x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+            x-transition:leave="ease-in duration-150"
+            x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+            x-transition:leave-end="opacity-0 translate-y-4 sm:scale-95"
+            class="relative w-full max-w-2xl max-h-[90vh] flex flex-col bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
+
+            <form action="{{ route('cycletimes.setting.update', $pattern->id) }}" method="POST" class="flex flex-col min-h-0">
+                @csrf
+                @method('PUT')
+
+                {{-- Header --}}
+                <div class="flex items-start gap-4 px-6 py-5 border-b border-gray-100">
+                    <div class="flex items-center justify-center shrink-0 w-10 h-10 bg-sky-100 rounded-full">
+                        <svg class="w-5 h-5 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h3 id="edit-title-{{ $pattern->id }}" class="text-lg font-bold text-gray-900">Edit Pattern</h3>
+                        <p class="text-xs text-gray-500 mt-0.5">Ubah nama, posisi sensor, dan batas waktu cycle.</p>
+                    </div>
+                    <button type="button" @click="editModalOpen = null"
+                            class="p-1.5 -mr-2 text-gray-400 rounded-lg hover:text-gray-600 hover:bg-gray-100 transition-colors" aria-label="Tutup">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+
+                {{-- Body (scrollable) --}}
+                <div class="flex-1 overflow-y-auto px-6 py-5 space-y-6">
+
+                    {{-- Name --}}
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+                            Pattern Name <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" name="name" value="{{ $pattern->name }}" required
+                            class="w-full text-sm rounded-xl border-gray-200 focus:ring-sky-500 focus:border-sky-500 transition-colors">
+                    </div>
+
+                    {{-- Sensors --}}
+                    <div>
+                        <div class="mb-3">
+                            <h4 class="text-sm font-semibold text-gray-700">Sensor Positions</h4>
+                            <p class="mt-0.5 text-xs text-gray-500">
+                                Cycle adalah jumlah barang dalam satu pembacaan; durasi akan dibagi nilai Cycle.
+                            </p>
                         </div>
-                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                            <h3 class="text-lg font-bold leading-6 text-gray-900" id="modal-title">Edit Pattern</h3>
-                            <div class="mt-5 space-y-4">
-                                {{-- Name --}}
-                                <div>
-                                    <label class="block text-sm font-semibold text-gray-700 mb-1">Pattern Name <span class="text-red-500">*</span></label>
-                                    <input type="text" name="name" value="{{ $pattern->name }}" required class="w-full text-sm rounded-xl border-gray-200 focus:ring-sky-500 focus:border-sky-500 transition-colors">
-                                </div>
-                                {{-- Sensors --}}
-                                <div>
-                                    <label class="block text-sm font-semibold text-gray-700 mb-2">Sensor Positions</label>
-                                    <p class="mb-2 text-xs text-gray-500">Cycle adalah jumlah barang dalam satu pembacaan; durasi akan dibagi nilai Cycle.</p>
-                                    <div class="grid grid-cols-2 lg:grid-cols-3 gap-3">
-                                        @foreach($sensors as $s)
-                                            @php 
-                                                $activeSensor = $pattern->sensors->firstWhere('id', $s->id); 
-                                                $posValue = $activeSensor ? $activeSensor->pivot->pos : '';
-                                                $cycleValue = $activeSensor ? $activeSensor->pivot->cycle : 1;
-                                            @endphp
-                                            <div class="flex items-center justify-between p-2 border border-gray-100 rounded-xl hover:bg-gray-50 transition-colors">
-                                                <span class="ml-2 text-sm font-medium text-gray-700">{{ $s->name }}</span>
-                                                <div class="grid grid-cols-2 gap-2">
-                                                    <label class="text-[10px] text-gray-500">Pos
-                                                        <input type="number" name="sensors[{{ $s->id }}][pos]" value="{{ $posValue }}" min="1" class="w-14 h-8 text-sm text-center border-gray-300 rounded-md focus:ring-sky-500 focus:border-sky-500" placeholder="1">
-                                                    </label>
-                                                    <label class="text-[10px] text-gray-500">Cycle
-                                                        <input type="number" name="sensors[{{ $s->id }}][cycle]" value="{{ $cycleValue }}" min="1" class="w-14 h-8 text-sm text-center border-gray-300 rounded-md focus:ring-sky-500 focus:border-sky-500" title="Jumlah barang per pembacaan">
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        @endforeach
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            @foreach($sensors as $s)
+                                @php
+                                    $activeSensor = $pattern->sensors->firstWhere('id', $s->id);
+                                    $posValue     = $activeSensor ? $activeSensor->pivot->pos : '';
+                                    $cycleValue   = $activeSensor ? $activeSensor->pivot->cycle : 1;
+                                @endphp
+                                <div x-data="{ on: {{ $activeSensor ? 'true' : 'false' }} }"
+                                    class="flex items-center justify-between gap-3 p-3 rounded-xl border transition-colors"
+                                    :class="on ? 'border-sky-200 bg-sky-50/40' : 'border-gray-100 bg-white'">
+
+                                    {{-- Toggle aktif (tanpa name, tidak ikut dikirim) --}}
+                                    <label class="flex items-center gap-2.5 min-w-0 cursor-pointer select-none">
+                                        <input type="checkbox" x-model="on"
+                                            class="w-4 h-4 rounded border-gray-300 text-sky-600 focus:ring-sky-500">
+                                        <span class="text-sm font-medium truncate"
+                                            :class="on ? 'text-gray-800' : 'text-gray-400'"
+                                            title="{{ $s->name }}">{{ $s->name }}</span>
+                                    </label>
+
+                                    <div class="flex items-end gap-2 shrink-0 transition-opacity" :class="on ? '' : 'opacity-40'">
+                                        <label class="block text-[10px] font-medium uppercase tracking-wide text-gray-500">
+                                            Pos
+                                            <input type="number" name="sensors[{{ $s->id }}][pos]" value="{{ $posValue }}"
+                                                min="1" placeholder="-" :disabled="!on" :required="on"
+                                                class="mt-1 block w-16 h-9 text-sm text-center border-gray-200 rounded-lg focus:ring-sky-500 focus:border-sky-500 disabled:bg-gray-100 disabled:cursor-not-allowed">
+                                        </label>
+                                        <label class="block text-[10px] font-medium uppercase tracking-wide text-gray-500">
+                                            Cycle
+                                            <input type="number" name="sensors[{{ $s->id }}][cycle]" value="{{ $cycleValue }}"
+                                                min="1" title="Jumlah barang per pembacaan" :disabled="!on" :required="on"
+                                                class="mt-1 block w-16 h-9 text-sm text-center border-gray-200 rounded-lg focus:ring-sky-500 focus:border-sky-500 disabled:bg-gray-100 disabled:cursor-not-allowed">
+                                        </label>
                                     </div>
                                 </div>
-                                {{-- Timings --}}
-                                <div class="grid grid-cols-3 gap-4 border-t border-gray-100 pt-4">
-                                    <div>
-                                        <label class="block text-sm font-semibold text-gray-700 mb-1">Target Cycle <span class="text-gray-400 text-xs font-normal">(sec)</span></label>
-                                        <input type="number" name="cycle_time" value="{{ $pattern->cycle_time }}" required step="0.1" min="0" class="w-full text-sm font-mono rounded-xl border-gray-200 focus:ring-sky-500 focus:border-sky-500">
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-semibold text-gray-700 mb-1">Min Threshold</label>
-                                        <input type="number" name="min_time" value="{{ $pattern->min_time }}" required step="0.1" min="0" class="w-full text-sm font-mono rounded-xl border-gray-200 focus:ring-sky-500 focus:border-sky-500">
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-semibold text-gray-700 mb-1">Max Threshold</label>
-                                        <input type="number" name="max_time" value="{{ $pattern->max_time }}" required step="0.1" min="0" class="w-full text-sm font-mono rounded-xl border-gray-200 focus:ring-sky-500 focus:border-sky-500">
-                                    </div>
-                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    {{-- Timings --}}
+                    <div class="pt-5 border-t border-gray-100">
+                        <h4 class="text-sm font-semibold text-gray-700 mb-3">Timing <span class="text-xs font-normal text-gray-400">(detik)</span></h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1.5">Target Cycle</label>
+                                <input type="number" name="cycle_time" value="{{ $pattern->cycle_time }}" required step="0.1" min="0"
+                                    class="w-full text-sm font-mono rounded-xl border-gray-200 focus:ring-sky-500 focus:border-sky-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1.5">Min Threshold</label>
+                                <input type="number" name="min_time" value="{{ $pattern->min_time }}" required step="0.1" min="0"
+                                    class="w-full text-sm font-mono rounded-xl border-gray-200 focus:ring-sky-500 focus:border-sky-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1.5">Max Threshold</label>
+                                <input type="number" name="max_time" value="{{ $pattern->max_time }}" required step="0.1" min="0"
+                                    class="w-full text-sm font-mono rounded-xl border-gray-200 focus:ring-sky-500 focus:border-sky-500">
                             </div>
                         </div>
                     </div>
-                    <div class="mt-5 sm:mt-8 sm:flex sm:flex-row-reverse gap-2">
-                        <button type="submit" class="w-full inline-flex justify-center rounded-xl border border-transparent px-4 py-2 shadow-sm text-base font-medium text-white bg-sky-600 hover:bg-sky-700 focus:outline-none sm:w-auto sm:text-sm transition-colors">
-                            Update Pattern
-                        </button>
-                        <button type="button" @click="editModalOpen = null" class="mt-3 w-full inline-flex justify-center rounded-xl border border-gray-300 px-4 py-2 shadow-sm text-base font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm transition-colors">
-                            Cancel
-                        </button>
-                    </div>
-                </form>
-            </div>
+                </div>
+
+                {{-- Footer --}}
+                <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 px-6 py-4 bg-gray-50 border-t border-gray-100">
+                    <button type="button" @click="editModalOpen = null"
+                            class="inline-flex justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200 transition-colors">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                            class="inline-flex justify-center px-5 py-2 text-sm font-medium text-white bg-sky-600 rounded-xl shadow-sm hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-300 transition-colors">
+                        Update Pattern
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
     @endforeach

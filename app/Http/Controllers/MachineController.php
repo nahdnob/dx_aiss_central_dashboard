@@ -20,8 +20,8 @@ class MachineController extends Controller
 
         // 2. Base query: select specific columns, count sops relation, filter by active line
         $query = Machine::select('id', 'asset_no', 'asset_name', 'acquisition_date', 'line_id')
-                        ->withCount('sops as sops_count')
-                        ->where('line_id', session('selected_line_id'));
+            ->withCount('sops as sops_count')
+            ->where('line_id', session('selected_line_id'));
 
         // 3. Additional filter if search input exists
         if ($search) {
@@ -74,6 +74,8 @@ class MachineController extends Controller
             $validated['image_path'] = $filename;
         }
 
+        $validated['line_id'] = session('selected_line_id');
+
         // 3. Insert new record to machines tabel with validated data
         Machine::create($validated);
 
@@ -88,20 +90,20 @@ class MachineController extends Controller
     {
         // 1. Find machine by asset_no
         $machine = Machine::where('asset_no', $id)
-                          ->with(['sops.riskAssessment','sops.dasgs',])
-                          ->firstOrFail();
+            ->with(['sops.riskAssessment','sops.dasgs',])
+            ->firstOrFail();
 
         // 2. Shortcut variable machine's sops collection
         $sops = $machine->sops;
 
         // 3. Flatten dasgs from all sops into one collection
         $allDasgs = $sops->flatMap(fn($sop) => $sop->dasgs)
-                         // 3.1. Remove duplicate dasgs
-                         ->unique('id')
-                         // 3.2. Sort alphabetically by name
-                         ->sortBy('name')
-                         // 3.3. Reset collection keys to sequential index after filter/sort
-                         ->values();
+            // 3.1. Remove duplicate dasgs
+            ->unique('id')
+            // 3.2. Sort alphabetically by name
+            ->sortBy('name')
+            // 3.3. Reset collection keys to sequential index after filter/sort
+            ->values();
 
         // 4. Return view with machine, sops, and aggregated dasgs
         return view('machines.partial', compact(

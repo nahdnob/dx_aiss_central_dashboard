@@ -13,6 +13,22 @@ use App\Models\User;
 
 class AuthController extends Controller
 {
+    // Tampilkan form login
+    public function showLoginForm()
+    {
+        // Sudah login: arahkan ke halaman sesuai status pilihan line
+        if (Auth::check()) {
+            return redirect()->route(
+                session('selected_line_id') ? 'system-managers.index' : 'dashboards.index'
+            );
+        }
+
+        // Ambil daftar line untuk form login
+        $lines = Line::orderBy('name')->get();
+
+        return view('auth.login', compact('lines'));
+    }
+
     // Registrasi user baru
     public function register(Request $request) {
 
@@ -21,7 +37,16 @@ class AuthController extends Controller
             'npk'      => 'required|unique:users',
             'name'     => 'required',
             'image'    => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'password' => 'required|min:6'
+            'password' => 'required|min:8'
+        ],[
+            'npk.required'      => 'NPK wajib diisi',
+            'npk.unique'        => 'NPK sudah terdaftar',
+            'name.required'     => 'Nama wajib diisi',
+            'image.image'       => 'File harus berupa gambar',
+            'image.mimes'       => 'Format gambar harus JPG, JPEG, atau PNG',
+            'image.max'         => 'Ukuran gambar maksimal 2MB',
+            'password.required' => 'Password wajib diisi',
+            'password.min'      => 'Password minimal 8 karakter'
         ]);
 
         $imagePath = null;
@@ -32,13 +57,13 @@ class AuthController extends Controller
             $imagePath = $request->file('image')->store('users', 'public');
         }
 
-        // Simpan user baru (password di-hash)
+        // Simpan user baru
         $user = User::create([
             'npk'      => $request->npk,
             'name'     => $request->name,
             'role'     => 'user',
             'image'    => $imagePath,
-            'password' => Hash::make($request->password)
+            'password' => Hash::make($request->password) // Password di-hash
         ]);
 
         Auth::login($user); // Auto-login setelah daftar
@@ -47,22 +72,10 @@ class AuthController extends Controller
             ->with('success', 'Registrasi berhasil, selamat datang!');
     }
 
-    // Tampilkan form login
-    public function showLoginForm()
-    {
-        // Kalau sudah login, langsung redirect
-        if (Auth::check()) {
-            return redirect()->route(session('selected_line_id') ? 'system-managers.index' : 'dashboards.index');
-        }
-
-        $lines = Line::orderBy('name')->get(); // Data untuk dropdown line
-
-        return view('auth.login', compact('lines'));
-    }
-
-    // Proses login
+    // User login
     public function login(Request $request) {
 
+        // Validasi input login
         $credentials = $request->validate([
             'npk'      => 'required',
             'password' => 'required'
@@ -73,7 +86,7 @@ class AuthController extends Controller
             $user = User::where('npk', $credentials['npk'])->firstOrFail();
 
             $request->session()->put('pending_login', [
-                'user_id' => $user->id,
+                'user_id'  => $user->id,
                 'remember' => $request->boolean('remember'),
             ]);
 
@@ -102,7 +115,7 @@ class AuthController extends Controller
 
         Auth::logout();
 
-        $request->session()->invalidate();     // Hapus session
+        $request->session()->invalidate();      // Hapus session
         $request->session()->regenerateToken(); // Buat CSRF token baru
 
         return redirect('/')->with('success', 'Logout berhasil!');
