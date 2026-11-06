@@ -16,7 +16,7 @@
                         <div class="w-full lg:w-72 shrink-0">
                             <div class="rounded-xl overflow-hidden border border-gray-200 h-48">
                                 <img
-                                    src="{{ $machine->image_path ? asset('storage/machines/images/' . $machine->image_path) : asset('assets/images/machine-1.jpg') }}"
+                                    src="{{ $machine->image_path ? asset('storage/machines/images/' . $machine->image_path) : asset('assets/images/default-machine.jpg') }}"
                                     alt="{{ $machine->asset_name }}"
                                     class="w-full h-full object-cover">
                             </div>
