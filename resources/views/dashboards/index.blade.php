@@ -220,8 +220,8 @@
 			class="fixed bottom-0 left-0 p-1 bg-[#fff333] text-2xl text-red-500">
 			{{ $marqueeText->text }}
 		</marquee>
-		@auth
-			<x-ui.modal id="profile-modal" maxWidth="max-w-md">
+		{{-- @auth
+			<x-modal id="profile-modal" maxWidth="max-w-md">
 				<x-ui.profile-card
 					:name="Auth::user()->name"
 					:email="Auth::user()->email"
@@ -229,7 +229,7 @@
 					:npk="Auth::user()->npk"
 					:image="Auth::user()->image ? asset('storage/' . Auth::user()->image) : asset('assets/images/profile-blank.jpg')"
 				/>
-			</x-ui.modal>
+			</x-modal>
 
 			@if(!$selectedLineId)
 				<x-line-select-modal :lines="$lines" />
@@ -240,10 +240,10 @@
 					});
 				</script>
 			@endif
-		@endauth
-		<x-ui.modal id="login-modal" maxWidth="max-w-3xl">
+		@endauth --}}
+		<x-modal id="login-modal" maxWidth="max-w-3xl">
 			<x-auth.login-form />
-		</x-ui.modal>
+		</x-modal>
 	<script src="https://cdn.jsdelivr.net/npm/@tailwindplus/elements@1" type="module"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3"></script>

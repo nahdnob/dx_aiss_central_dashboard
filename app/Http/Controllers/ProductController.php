@@ -18,10 +18,30 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request) {
-        
-        // INPUT
-        $search = $request->input('search');
+    public function index(Request $request)
+    {
+        return view('products.index', [
+            ...$this->summaryData(),
+            ...$this->logData($request),
+        ]);
+    }
+
+    public function summary()
+    {
+        return response()
+            ->view('products.partials.summary', $this->summaryData())
+            ->header('Cache-Control', 'no-store');
+    }
+
+    public function log(Request $request)
+    {
+        return response()
+            ->view('products.partials.log', $this->logData($request))
+            ->header('Cache-Control', 'no-store');
+    }
+
+    private function summaryData(): array
+    {
         $lineId = session('selected_line_id');
 
         $timeOutSub = ProductIn::query()
@@ -31,7 +51,6 @@ class ProductController extends Controller
             ->whereColumn('product_ins.id', '<=', 'product_summaries.last_id')
             ->selectRaw('MAX(product_outs.time_out)');
 
-        // PROCESS
         $products = ProductSummary::where('line_id', $lineId)
             ->select('product_summaries.*')
             ->addSelect(['last_time_out' => $timeOutSub])
@@ -42,10 +61,20 @@ class ProductController extends Controller
             )
             ->orderByDesc('product_summaries.id')
             ->paginate(10, ['*'], 'page_products')
+            ->withPath(route('products.index'))
             ->withQueryString();
 
-        $totalIn  = ProductSummary::where('line_id', $lineId)->sum('qty_in');
-        $totalOut = ProductSummary::where('line_id', $lineId)->sum('qty_out');
+        $totalIn   = ProductSummary::where('line_id', $lineId)->sum('qty_in');
+        $totalOut  = ProductSummary::where('line_id', $lineId)->sum('qty_out');
+        $runningId = ProductSummary::where('line_id', $lineId)->max('id');
+
+        return compact('products', 'totalIn', 'totalOut', 'runningId');
+    }
+
+    private function logData(Request $request): array
+    {
+        $search = $request->input('search');
+        $lineId = session('selected_line_id');
 
         $datas = ProductIn::where('line_id', $lineId)
             ->select('id', 'product_out_id', 'part_id', 'part_number', 'time_in', 'quantity')
@@ -53,59 +82,9 @@ class ProductController extends Controller
             ->when($search, fn ($q) => $q->where('part_id', 'like', "%{$search}%"))
             ->orderBy('time_in', 'desc')
             ->paginate(10, ['*'], 'page_parts')
+            ->withPath(route('products.index'))
             ->withQueryString();
 
-        // OUTPUT
-        $runningId = ProductSummary::where('line_id', $lineId)->max('id');
-
-        return view('products.index', compact('products', 'datas', 'totalIn', 'totalOut', 'runningId'));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Product $product)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Product $product)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Product $product)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Product $product)
-    {
-        //
+        return compact('datas');
     }
 }

@@ -37,7 +37,7 @@ class UserController extends Controller
             'name'     => 'required|string|max:255',
             'npk'      => 'required|string|unique:users,npk|max:50',
             'email'    => 'nullable|email|unique:users,email|max:255',
-            'role'     => 'required|in:admin,user',
+            'role'     => 'required|in:admin,leader,user',
             'password' => 'required|string|min:6',
             'image'    => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
@@ -62,7 +62,7 @@ class UserController extends Controller
             'name'     => 'required|string|max:255',
             'npk'      => 'required|string|max:50|unique:users,npk,' . $user->id,
             'email'    => 'nullable|email|max:255|unique:users,email,' . $user->id,
-            'role'     => 'required|in:admin,user',
+            'role'     => 'required|in:admin,leader,user',
             'password' => 'nullable|string|min:6',
             'image'    => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);

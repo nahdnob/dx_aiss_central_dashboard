@@ -1,0 +1,1 @@
+<x-table.pages.production-log :datas="$datas" />

@@ -62,6 +62,7 @@
                             <select name="role" id="add_role" required
                                 class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent transition">
                                 <option value="user" {{ old('role') === 'user' ? 'selected' : '' }}>User</option>
+                                <option value="leader" {{ old('role') === 'leader' ? 'selected' : '' }}>Leader</option>
                                 <option value="admin" {{ old('role') === 'admin' ? 'selected' : '' }}>Admin</option>
                             </select>
                         </div>
@@ -177,6 +178,10 @@
                                         <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700">
                                             Admin
                                         </span>
+                                    @elseif($item->role === 'leader')
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-sky-100 text-sky-700">
+                                            Leader
+                                        </span>
                                     @else
                                         <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-600">
                                             User
@@ -251,12 +256,12 @@
         </div>
 
     </div>
-    <x-ui.footer />
+    <x-layout.footer />
 </div>
 
 {{-- ===== EDIT MODALS ===== --}}
 @foreach($users as $item)
-    <x-ui.modal id="edit-user-modal-{{ $item->id }}">
+    <x-modal id="edit-user-modal-{{ $item->id }}">
         <div class="w-full bg-white rounded-2xl shadow-2xl flex flex-col" style="width: 680px; max-width: 95vw; max-height: 90vh;">
 
             {{-- Modal Header --}}
@@ -308,6 +313,7 @@
                             <select name="role" required
                                 class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-sky-400 transition">
                                 <option value="user" {{ $item->role === 'user' ? 'selected' : '' }}>User</option>
+                                <option value="leader" {{ $item->role === 'leader' ? 'selected' : '' }}>Leader</option>
                                 <option value="admin" {{ $item->role === 'admin' ? 'selected' : '' }}>Admin</option>
                             </select>
                         </div>
@@ -361,7 +367,7 @@
                 </div>
             </form>
         </div>
-    </x-ui.modal>
+    </x-modal>
 @endforeach
 
 <script>

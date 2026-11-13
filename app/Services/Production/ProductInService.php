@@ -4,7 +4,8 @@ namespace App\Services\Production;
 
 use App\Models\Line;
 use App\Models\ProductIn;
-use App\Models\Shift;
+use App\Models\ProductSummary;
+// use App\Models\Shift;
 use App\Services\Production\SummaryService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
@@ -13,7 +14,8 @@ class ProductInService
 {
 
     public function __construct(
-        protected SummaryService $summaryService
+        protected SummaryService $summaryService,
+        protected ShiftResolver $shifts
     ) {}
 
     public function sync(): void {
@@ -26,15 +28,21 @@ class ProductInService
     private function syncLine(Line $line): void {
 
         $today    = now();
-        $now      = $today->format('H:i:s');
-        $lastData = ProductIn::where('line_id', $line->id)->latest()->first();
+        $shift    = $this->shifts->current($today);
+        $lastData = ProductIn::where('line_id', $line->id)->orderByDesc('id')->first();
+
+        $folderDate = $shift['folder_date'] ?? $today->copy();
+        $filePath   = ($shift && $shift['folder'])
+            ? $this->getFilePath($line, $folderDate, $shift['folder'])
+            : null;
 
         if ($lastData === null) {
 
-            $shiftId  = $this->getShiftId($now);
-            $filePath = $this->setFilePath($line, $today, $now, $shiftId);
+            if ($filePath === null) {
+                return;
+            }
 
-            $this->processFile($line, $today, $filePath);
+            $this->processFile($line, $folderDate, $filePath);
             return;
         }
 
@@ -46,31 +54,26 @@ class ProductInService
             return;
         }
 
-        $shiftId  = $this->getShiftId($now);
-        $filePath = $this->setFilePath($line, $today, $now, $shiftId);
-
-        try {
-
-            $data = file($filePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-
-        } catch (\Throwable $e) {
-
-            Log::error($e->getMessage());
+        if ($filePath === null || !file_exists($filePath)) {
             return;
         }
+
+        $data = file($filePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 
         $lastIndex = collect($data)->search(
             fn ($row) => str_contains($row, $lastData->part_id)
         );
 
-        if ($lastIndex === false || $lastIndex === array_key_last($data)) {
+        if ($lastIndex !== false && $lastIndex === array_key_last($data)) {
             return;
         }
 
-        $this->processFile($line, $today, $filePath, $lastIndex + 1);
+        $startIndex = $lastIndex === false ? 0 : $lastIndex + 1;
+
+        $this->processFile($line, $folderDate, $filePath, $startIndex);
     }
 
-    private function setFilePath(Line $line, $today, string $now, int $shiftId): ?string {
+    private function setFilePath(Line $line, $today, string $now, ?int $shiftId): ?string {
 
         if ($shiftId === 1) {
 
@@ -115,7 +118,22 @@ class ProductInService
                 $product = $this->save($line, $currentDate, $parsed);
 
                 if ($product) {
-                    $this->summaryService->updateSummary($product);
+                    $alreadyCovered = !$product->wasRecentlyCreated
+                        && ProductSummary::where('line_id', $product->line_id)
+                            ->where('first_id', '<=', $product->id)
+                            ->where('last_id', '>=', $product->id)
+                            ->exists();
+
+                    if (!$alreadyCovered) {
+                        try {
+                            $this->summaryService->updateSummary($product);
+                        } catch (\Throwable $e) {
+                            Log::error('[PRODUCT-IN][SUMMARY_FAIL]', [
+                                'part_id' => $product->part_id,
+                                'error'   => $e->getMessage(),
+                            ]);
+                        }
+                    }
                 }
             }
         }
@@ -154,9 +172,7 @@ class ProductInService
         }
 
         $baseDate = $currentDate->copy();
-        $timeOnly = Carbon::createFromFormat('H:i:s', $parsed['timeIn']);
-
-        if ($timeOnly->lt(Carbon::createFromTime(7, 30))) {
+        if ($parsed['timeIn'] < $this->shifts->workdayStart()) {
             $baseDate->addDay();
         }
 
@@ -175,9 +191,16 @@ class ProductInService
         );
     }
 
-    private function calibrate(Line $line, $lastData, string $lastDate, string $nowDate): void {
+    private function calibrate(Line $line, $lastData, string $lastDate, string $nowDate): int {
 
-        $currentDate = Carbon::parse($lastDate)->startOfDay();
+        $count    = 0;
+        $lastTime = Carbon::parse($lastData->time_out)->format('H:i:s');
+
+        $lastFolderDate = $lastTime < $this->shifts->workdayStart()
+            ? Carbon::parse($lastDate)->subDay()->toDateString()
+            : $lastDate;
+
+        $currentDate = Carbon::parse($lastFolderDate)->startOfDay();
         $endDate     = Carbon::parse($nowDate)->startOfDay();
         $shifts      = ['DAY', 'NIGHT'];
 
@@ -193,22 +216,24 @@ class ProductInService
 
                 $startIndex = 0;
 
-                if ($currentDate->toDateString() === $lastDate) {
+                if ($currentDate->toDateString() === $lastFolderDate) {
 
                     $data = file($filePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 
                     $foundIndex = collect($data)->search(
-                        fn ($row) => str_contains($row, $lastData->part_id)
+                        fn ($row) => str_contains($row, $lastData->tag_id)
                     );
 
                     $startIndex = ($foundIndex !== false) ? $foundIndex + 1 : 0;
                 }
 
-                $this->processFile($line, $currentDate, $filePath, $startIndex);
+                $count += $this->processFile($line, $currentDate, $filePath, $startIndex);
             }
 
             $currentDate->addDay();
         }
+
+        return $count;
     }
 
     private function getShiftId(string $time): ?int {

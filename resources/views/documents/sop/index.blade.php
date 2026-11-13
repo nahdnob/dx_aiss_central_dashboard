@@ -72,7 +72,7 @@
                         </div>
                         <div class="flex-1 min-w-0">
                             <label class="block text-[10px] font-bold tracking-widest text-gray-400 uppercase mb-1">Risk Assessment</label>
-                            <x-ui.searchable-dropdown
+                            <x-form.searchable-dropdown
                                 id="ra"
                                 name="ra_id"
                                 placeholder="Select Risk Assessment"
@@ -100,7 +100,7 @@
                                         </a>
                                     </li>
                                 @endforeach
-                            </x-ui.searchable-dropdown>
+                            </x-form.searchable-dropdown>
                         </div>
                         <div class="shrink-0 w-full sm:w-auto">
                             <button
@@ -257,7 +257,7 @@
                         $label = 'block text-xs font-bold tracking-wide text-gray-500 uppercase mb-1.5';
                     @endphp
 
-                    <x-ui.modal id="edit-sop-modal-{{ $item->id }}">
+                    <x-modal id="edit-sop-modal-{{ $item->id }}">
                         <div class="w-full bg-white rounded-2xl shadow-2xl flex flex-col" style="width: 860px; max-width: 95vw; max-height: 90vh;">
 
                             {{-- Header --}}
@@ -358,7 +358,7 @@
                                         {{-- Risk Assessment --}}
                                         <div>
                                             <label class="{{ $label }}">Risk Assessment</label>
-                                            <x-ui.searchable-dropdown
+                                            <x-form.searchable-dropdown
                                                 :id="'ra-edit-' . $item->id"
                                                 name="ra_id"
                                                 placeholder="Select Risk Assessment"
@@ -383,7 +383,7 @@
                                                         </a>
                                                     </li>
                                                 @endforeach
-                                            </x-ui.searchable-dropdown>
+                                            </x-form.searchable-dropdown>
                                             <p class="mt-1 text-xs text-gray-400">Optional. Link this SOP to its active risk assessment.</p>
                                         </div>
                                     </div>
@@ -419,7 +419,7 @@
                                 </div>
                             </form>
                         </div>
-                    </x-ui.modal>
+                    </x-modal>
                 @endforeach
                 @once
                 <script>
@@ -479,7 +479,7 @@
             </div>
         </div>
     </div>
-    <x-ui.footer />
+    <x-layout.footer />
 </div>
 <script>
     // Handle file input for add form

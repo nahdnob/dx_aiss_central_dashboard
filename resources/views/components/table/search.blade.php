@@ -17,8 +17,8 @@
                placeholder="{{ $placeholder }}"
                class="placeholder:text-gray-400 block w-full pl-9 pr-4 py-2.5 text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent transition">
     </div>
-    <x-button type="submit" class="shrink-0">Search</x-button>
+    <x-ui.button type="submit" class="shrink-0">Search</x-ui.button>
     @if (request($name))
-        <x-button variant="secondary" :href="$action" class="shrink-0">Reset</x-button>
+        <x-ui.button variant="secondary" :href="$action" class="shrink-0">Reset</x-ui.button>
     @endif
 </form>

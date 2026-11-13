@@ -33,7 +33,8 @@ return new class extends Migration
                   ->default(0);
             $table->timestamps();
 
-            $table->unique(['line_id', 'part_number']);
+            $table->index(['line_id', 'part_number']);
+            $table->unique(['line_id', 'first_id']);
         });
     }
 

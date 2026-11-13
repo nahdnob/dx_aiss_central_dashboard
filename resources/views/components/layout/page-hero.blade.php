@@ -32,7 +32,7 @@
     {{-- Content --}}
     <div class="relative z-40 px-8 py-5 pl-[380px] min-h-[140px] flex flex-col justify-center">
         @if (!empty($breadcrumbs))
-            <x-breadcrumb :items="$breadcrumbs" />
+            <x-layout.breadcrumb :items="$breadcrumbs" />
         @endif
 
         <h1 class="text-2xl font-bold text-gray-900 tracking-tight uppercase">

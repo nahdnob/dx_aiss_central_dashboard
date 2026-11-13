@@ -1,0 +1,1 @@
+<x-table.pages.production-summary :products="$products" :runningId="$runningId" />

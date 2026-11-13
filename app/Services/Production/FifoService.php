@@ -20,11 +20,13 @@ class FifoService
 
             $productIns = ProductIn::where('part_number', $productOut->part_number)
                 ->whereNull('product_out_id')
+                ->where('line_id', $productOut->line_id)
                 ->where('is_processed', 0)
+                ->where('time_in', '<=', $productOut->time_out)
                 ->orderBy('time_in')
                 ->orderBy('id')
                 ->lockForUpdate()
-                ->cursor();
+                ->get();
 
             foreach ($productIns as $pi) {
                 if ($used >= $needed) {

@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
+import { globSync } from 'glob';
 
 export default defineConfig({
     plugins: [
@@ -7,7 +8,7 @@ export default defineConfig({
             input: [
                 'resources/css/app.css',
                 'resources/js/app.js',
-                'resources/js/entries/login.js'
+                ...globSync('resources/js/entries/*.js', { posix: true }),
             ],
             refresh: true,
         }),

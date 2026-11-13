@@ -17,121 +17,74 @@ use App\Http\Controllers\RiskAssessmentController;
 use App\Http\Controllers\SopController;
 use App\Http\Controllers\SystemManagerController;
 use App\Http\Controllers\UserController;
-
 use Illuminate\Support\Facades\Route;
 
-// Auth - Public
+// Public routes
 Route::get('/', [AuthController::class, 'showLoginForm'])->name('login.form');
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-
-// Line Selector
 Route::post('/select-line', [LineController::class, 'select'])->name('line-selector.select');
-
-// Machines - Specific machine view
-Route::get('machines/{id}', [MachineController::class, 'show'])->name('machines.show');
-
-// Product - fetch product table (AJAX)
+Route::get('/machines/{id}', [MachineController::class, 'show'])->name('machines.show');
 Route::get('/fetch-products-table', [DashboardController::class, 'fetchProductsTable'])->name('products.fetchTable');
-
-// Masrquee Text - update (AJAX)
 Route::post('/marqueeText/update', [MarqueeTextController::class, 'update'])->name('marqueeText.update');
 
-// Auth - Private (login required)
-Route::middleware(['auth'])->group(function () {
-
-    // TIER 1: Semua role login (admin, leader, user)
-    Route::middleware(['role:admin,leader,user'])->group(function () {
-
-        // Dashboard
+Route::middleware('auth')->group(function () {
+    // Features available to every signed-in role.
+    Route::middleware('role:admin,leader,user')->group(function () {
         Route::resource('dashboards', DashboardController::class);
-
-        // Line Selector
         Route::get('/select-line', [LineController::class, 'index'])->name('line-selector.index');
         Route::post('/clear-line', [LineController::class, 'clear'])->name('line-selector.clear');
 
-        Route::middleware(['line.selected'])->group(function () {
+        Route::middleware('line.selected')->group(function () {
+            Route::resource('machines', MachineController::class)
+                ->except(['show'])
+                ->parameters(['machines' => 'id']);
+            Route::post('/machines/{id}/sop', [MachineController::class, 'attachSop'])->name('machines.sop.attach');
+            Route::delete('/machines/{id}/sop/{sopId}', [MachineController::class, 'detachSop'])->name('machines.sop.detach');
 
-            // Machine Management (view + interaksi dasar)
-            Route::resource('machines', MachineController::class)->except(['show'])->parameters(['machines' => 'id']);
-            Route::post('machines/{id}/sop', [MachineController::class, 'attachSop'])->name('machines.sop.attach');
-            Route::delete('machines/{id}/sop/{sopId}', [MachineController::class, 'detachSop'])->name('machines.sop.detach');
-
-            // Documents - index (lihat daftar dokumen, boleh semua role)
             Route::get('/documents', [DocumentController::class, 'index'])->name('documents.index');
-            Route::get('dasgs', [DasgController::class, 'index'])->name('dasgs.index');
-            Route::get('sops', [SopController::class, 'index'])->name('sops.index');
-            Route::get('risk-assessments', [RiskAssessmentController::class, 'index'])->name('risk-assessments.index');
+            Route::get('/dasgs', [DasgController::class, 'index'])->name('dasgs.index');
+            Route::get('/sops', [SopController::class, 'index'])->name('sops.index');
+            Route::get('/risk-assessments', [RiskAssessmentController::class, 'index'])->name('risk-assessments.index');
 
-            // Cycle Times - Monitoring (read-only untuk semua role)
             Route::get('/cycletimes/monitoring', [CycleTimeController::class, 'index'])->name('cycletimes.monitoring.index');
             Route::get('/cycletimes/monitoring/export-csv', [CycleTimeController::class, 'exportCsv'])->name('cycletimes.monitoring.export-csv');
             Route::get('/cycletimes/monitoring/export-pdf', [CycleTimeController::class, 'exportPdf'])->name('cycletimes.monitoring.export-pdf');
         });
     });
 
-    // =====================================================================
-    // TIER 2: admin & leader saja (kelola data)
-    // =====================================================================
-    Route::middleware(['role:admin,leader'])->group(function () {
-
-        // Register user baru (form + submit disatukan di sini)
-        Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register.form');
-        Route::post('/register', [AuthController::class, 'register'])->name('register');
-
-        // System Manager
+    // Data management shared by admins and leaders.
+    Route::middleware('role:admin,leader')->group(function () {
         Route::get('/system-managers', [SystemManagerController::class, 'index'])->name('system-managers.index');
-
-        // User Management
-        Route::resource('users', UserController::class)->only(['index', 'store', 'update', 'destroy']);
-
-        // Pattern Histories
         Route::resource('pattern-histories', PatternHistoryController::class);
 
-        Route::middleware(['line.selected'])->group(function () {
-
-            // Best Records
+        Route::middleware('line.selected')->group(function () {
             Route::resource('best-records', BestRecordController::class);
-
-            // Line Performance
             Route::resource('line-performance', LinePerformanceController::class);
-
-            // Product Management
+            Route::get('/products/summary', [ProductController::class, 'summary'])->name('products.summary');
+            Route::get('/products/log', [ProductController::class, 'log'])->name('products.log');
             Route::resource('products', ProductController::class);
 
-            // Documents - kelola (create/update/delete)
             Route::resource('dasgs', DasgController::class)
-                ->only(['store', 'update', 'destroy'])
-                ->names([
-                    'store'   => 'dasgs.store',
-                    'update'  => 'dasgs.update',
-                    'destroy' => 'dasgs.destroy',
-                ]);
-
+                ->only(['store', 'update', 'destroy']);
             Route::resource('sops', SopController::class)
-                ->only(['store', 'update', 'destroy'])
-                ->names([
-                    'store'   => 'sops.store',
-                    'update'  => 'sops.update',
-                    'destroy' => 'sops.destroy',
-                ]);
-
+                ->only(['store', 'update', 'destroy']);
             Route::resource('risk-assessments', RiskAssessmentController::class)
-                ->only(['store', 'update', 'destroy'])
-                ->names([
-                    'store'   => 'risk-assessments.store',
-                    'update'  => 'risk-assessments.update',
-                    'destroy' => 'risk-assessments.destroy',
-                ]);
+                ->only(['store', 'update', 'destroy']);
 
-            // Cycle Times Setting
-            Route::post('cycletimes/setting/upload-map', [PatternController::class, 'uploadMap'])->name('cycletimes.setting.upload-map');
+            Route::post('/cycletimes/setting/upload-map', [PatternController::class, 'uploadMap'])
+                ->name('cycletimes.setting.upload-map');
             Route::resource('cycletimes/setting', PatternController::class)->names([
-                'index'   => 'cycletimes.setting.index',
-                'store'   => 'cycletimes.setting.store',
-                'update'  => 'cycletimes.setting.update',
+                'index' => 'cycletimes.setting.index',
+                'store' => 'cycletimes.setting.store',
+                'update' => 'cycletimes.setting.update',
                 'destroy' => 'cycletimes.setting.destroy',
             ]);
         });
+    });
+
+    // User management is exclusive to admins.
+    Route::middleware('role:admin')->group(function () {
+        Route::resource('users', UserController::class)->only(['index', 'store', 'update', 'destroy']);
     });
 });

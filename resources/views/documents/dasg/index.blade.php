@@ -211,7 +211,7 @@
                     </table>
                     {{-- ===== EDIT MODALS ===== --}}
                     @foreach ($dasgs as $item)
-                        <x-ui.modal id="edit-dasg-modal-{{ $item->id }}">
+                        <x-modal id="edit-dasg-modal-{{ $item->id }}">
                             <div class="w-full bg-white rounded-2xl shadow-2xl flex flex-col mx-auto" style="width: 580px; max-width: 95vw; max-height: 90vh;">
                                 {{-- Modal Header --}}
                                 <div class="flex items-center gap-3 px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-sky-50 to-white shrink-0 rounded-t-2xl">
@@ -279,7 +279,7 @@
                                     </div>
                                 </form>
                             </div>
-                        </x-ui.modal>
+                        </x-modal>
                     @endforeach
                     {{-- Pagination --}}
                     <div class="flex items-center justify-between px-5 py-3 border-t border-gray-100">
@@ -302,7 +302,7 @@
                 </div>
             </div>
         </div>
-        <x-ui.footer />
+        <x-layout.footer />
     </div>
 @endsection
 

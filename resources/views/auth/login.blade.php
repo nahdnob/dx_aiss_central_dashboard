@@ -74,7 +74,7 @@
             </form>
         </div>
     </div>
-    <x-line-select-modal :lines="$lines" />
+    <x-modal.pages.line-select :lines="$lines" />
 @endsection
 
 @push('scripts')

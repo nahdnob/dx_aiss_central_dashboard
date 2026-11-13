@@ -8,8 +8,8 @@ use App\Models\ProductSummary;
 
 class SummaryService
 {
-    public function updateSummary(ProductIn $in): void
-    {
+    public function updateSummary(ProductIn $in): void {
+        
         $latest = ProductSummary::where('line_id', $in->line_id)
             ->orderByDesc('id')
             ->first();

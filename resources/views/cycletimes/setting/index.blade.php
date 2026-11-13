@@ -435,7 +435,7 @@
     </div>
     @endforeach
 
-    <x-ui.footer />
+    <x-layout.footer />
 </div>
 
 @endsection

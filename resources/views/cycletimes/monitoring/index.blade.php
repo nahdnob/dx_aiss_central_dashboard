@@ -356,7 +356,7 @@
                 @endforelse
             </div>
         </div>
-        <x-ui.footer />
+        <x-layout.footer />
     </div>
 @endsection
 
