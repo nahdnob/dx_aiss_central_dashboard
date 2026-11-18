@@ -39,11 +39,7 @@ class CycleTimeController extends Controller
         $realtimeSummary = $this->realtimeService->getTodaySummary($activePatternId, $lineId);
         $realtimeData    = $this->realtimeService->calculateRealtime($activePattern, $realtimeSummary);
 
-        $recentLogs = SensorHistory::with('sensor:id,name', 'pattern:id,name,cycle_time')
-            ->where('line_id', $lineId)
-            ->when($activePatternId, fn($q) => $q->where('pattern_id', $activePatternId))
-            ->latest('time')
-            ->paginate(5);
+        $recentActivity = $this->realtimeService->getRecentActivity($activePattern, $lineId, 6);
 
         $filterPatternId = request('pattern_id') ?: $activePatternId;
         $filterPattern   = $filterPatternId ? Pattern::where('line_id', $lineId)->find($filterPatternId) : null;
@@ -73,7 +69,7 @@ class CycleTimeController extends Controller
             'created_at'
         )->whereHas('workHour', fn($q) => $q->where('shift_id', $filterShiftId));
 
-        $scatterData = $this->summaryService->getScatterData($scatterQuery);
+        $scatterData = $this->summaryService->getScatterData($scatterQuery, $filterPattern);
         $summaryData = $this->summaryService->getSummaryData($hourlySummaryQuery, $sensors);
 
         return view('cycletimes.monitoring.index', compact(
@@ -81,7 +77,7 @@ class CycleTimeController extends Controller
             'patterns',
             'sensors',
             'realtimeData',
-            'recentLogs',
+            'recentActivity',
             'scatterData',
             'summaryData',
             'shifts',

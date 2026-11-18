@@ -3,3 +3,4 @@
 @tailwind utilities;
 
 @import "@fontsource/inter/variable.css";
+[x-cloak] { display: none !important; }

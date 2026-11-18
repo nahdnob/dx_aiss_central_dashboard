@@ -13,9 +13,10 @@
         'secondary' => 'bg-gray-100 text-gray-600 hover:bg-gray-200',
     ];
 
+    // Tombol berlabel: ikon (svg) selalu tampil di KIRI label, apa pun urutannya di markup
     $size = $icon
         ? 'justify-center w-8 h-8 rounded-full'
-        : 'gap-2 text-sm px-5 py-2.5 rounded-lg uppercase';
+        : 'gap-2 text-sm px-5 py-2.5 rounded-lg uppercase [&>svg]:order-first [&>svg]:shrink-0';
 
     $classes = "inline-flex items-center font-bold transition whitespace-nowrap {$size} {$variants[$variant]}";
 @endphp

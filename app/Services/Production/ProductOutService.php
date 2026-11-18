@@ -73,6 +73,7 @@ class ProductOutService
             }
 
             $count = $this->processFile($line, $folderDate, $filePath);
+            SyncState::markCaughtUp(SyncState::OUT, $line->id);
             Log::info('[PRODUCT-OUT][SYNC_END]', ['line_id' => $line->id, 'processed' => $count, 'mode' => 'initial']);
             return $count;
         }
@@ -81,7 +82,11 @@ class ProductOutService
         $nowDate  = $today->toDateString();
 
         if ($lastDate !== $nowDate) {
+            // Selama kalibrasi berjalan, WIP belum boleh ditutup otomatis.
+            // Jika kalibrasi gagal di tengah jalan, status tetap "belum caught up".
+            SyncState::markCalibrating(SyncState::OUT, $line->id);
             $count = $this->calibrate($line, $lastData, $lastDate, $nowDate);
+            SyncState::markCaughtUp(SyncState::OUT, $line->id);
             Log::info('[PRODUCT-OUT][SYNC_END]', ['line_id' => $line->id, 'processed' => $count, 'mode' => 'calibration']);
             return $count;
         }
@@ -98,6 +103,7 @@ class ProductOutService
         );
 
         if ($lastIndex !== false && $lastIndex === array_key_last($data)) {
+            SyncState::markCaughtUp(SyncState::OUT, $line->id);
             Log::info('[PRODUCT-OUT][NO_NEW_DATA]', ['line_id' => $line->id]);
             return 0;
         }
@@ -105,6 +111,7 @@ class ProductOutService
         $startIndex = $lastIndex === false ? 0 : $lastIndex + 1;
 
         $count = $this->processFile($line, $folderDate, $filePath, $startIndex);
+        SyncState::markCaughtUp(SyncState::OUT, $line->id);
 
         Log::info('[PRODUCT-OUT][SYNC_END]', ['line_id' => $line->id, 'processed' => $count]);
 
@@ -255,9 +262,10 @@ class ProductOutService
         return $this->fifoService->process($productOut);
     }
 
-    private function calibrate(Line $line, $lastData, string $lastDate, string $nowDate): void {
+    private function calibrate(Line $line, $lastData, string $lastDate, string $nowDate): int {
 
-        $lastTime = Carbon::parse($lastData->time_in)->format('H:i:s');
+        $count    = 0;
+        $lastTime = Carbon::parse($lastData->time_out)->format('H:i:s');
 
         $lastFolderDate = $lastTime < $this->shifts->workdayStart()
             ? Carbon::parse($lastDate)->subDay()->toDateString()
@@ -284,17 +292,19 @@ class ProductOutService
                     $data = file($filePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 
                     $foundIndex = collect($data)->search(
-                        fn ($row) => str_contains($row, $lastData->part_id)
+                        fn ($row) => str_contains($row, $lastData->tag_id)
                     );
 
                     $startIndex = ($foundIndex !== false) ? $foundIndex + 1 : 0;
                 }
 
-                $this->processFile($line, $currentDate, $filePath, $startIndex);
+                $count += $this->processFile($line, $currentDate, $filePath, $startIndex);
             }
 
             $currentDate->addDay();
         }
+
+        return $count;
     }
 
 

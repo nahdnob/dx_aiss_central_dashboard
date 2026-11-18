@@ -19,6 +19,23 @@ class SensorHistory extends Model
         'status'
     ];
 
+    /**
+     * Sembunyikan data sampah: pembacaan dengan duration < except_time milik
+     * pattern-nya (trigger tidak sengaja). Baris yang durasinya belum dihitung
+     * (null) tetap disertakan.
+     */
+    public function scopeAboveExceptTime($query)
+    {
+        $table = $this->getTable();
+
+        return $query->where(function ($q) use ($table) {
+            $q->whereNull("{$table}.duration")
+              ->orWhereRaw(
+                  "{$table}.duration >= COALESCE((SELECT patterns.except_time FROM patterns WHERE patterns.id = {$table}.pattern_id), 0)"
+              );
+        });
+    }
+
     public function pattern()
     {
         return $this->belongsTo(Pattern::class);

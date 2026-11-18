@@ -30,158 +30,20 @@
                         </p>
                     </div>
                     {{-- Select Mode + Quick Info --}}
-                    <div class="flex flex-wrap items-center gap-3">
-                        {{-- Inline Pattern Selector --}}
-                        <form action="{{ route('pattern-histories.store') }}" method="POST" class="flex items-center gap-2 px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl shadow-sm">
-                            @csrf
-                            <input type="hidden" name="line_id" value="{{ session('selected_line_id') }}">
-                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap">Mode</label>
-                            <select name="pattern" class="bg-white border border-gray-200 text-gray-800 text-xs font-semibold rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent px-2.5 py-1.5 transition-all">
-                                @foreach($patterns as $pattern)
-                                    <option value="{{ $pattern->id }}" {{ $activePattern && $activePattern->id == $pattern->id ? 'selected' : '' }}>
-                                        {{ $pattern->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            <button type="submit"
-                                    class="px-4 py-1.5 bg-gradient-to-r from-red-600 to-rose-700 hover:brightness-110 text-white text-xs font-bold rounded-lg transition-all duration-200 shadow-sm whitespace-nowrap uppercase">
-                                Apply
-                            </button>
-                        </form>
-                        {{-- Quick Info Badge --}}
-                        <div class="flex items-center gap-4 px-5 py-2.5 bg-gray-50 rounded-xl border border-gray-200 shadow-sm">
-                            <div class="text-center">
-                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Active Mode</p>
-                                <p class="text-xs font-bold text-gray-900 mt-0.5">{{ $activePattern->name ?? '-' }}</p>
-                            </div>
-                            <div class="w-px h-8 bg-gray-200"></div>
-                            <div class="text-center">
-                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">SCL</p>
-                                <p class="text-xs font-bold text-red-600 mt-0.5">{{ $activePattern->cycle_time ?? '-' }}s</p>
-                            </div>
-                            <div class="w-px h-8 bg-gray-200"></div>
-                            <div class="text-center">
-                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">LCL / UCL</p>
-                                <p class="text-xs font-bold text-gray-700 mt-0.5">{{ $activePattern->min_time ?? '-' }}s / {{ $activePattern->max_time ?? '-' }}s</p>
-                            </div>
-                        </div>
-                    </div>
+                    <x-cycle-time.mode-switcher :patterns="$patterns" :active-pattern="$activePattern" />
                 </div>
             </div>
             <!-- Tambahkan tampilan nya disini -->
             {{-- ===== MAIN GRID ===== --}}
             <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
                 {{-- Chart Card (2/3 width) --}}
-                <div class="xl:col-span-2">
-                    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden h-full flex flex-col">
-                        <div class="p-4 border-b border-gray-100 flex items-center justify-between shrink-0">
-                            <h3 class="font-bold text-gray-900 text-sm tracking-tight flex items-center gap-2">
-                                <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
-                                <span class="text-sm font-bold text-slate-700 uppercase">Real-time Performance Chart</span>
-                            </h3>
-                            <div class="flex items-center gap-4 text-[10px] font-bold uppercase tracking-widest text-gray-400">
-                                <span class="flex items-center gap-1.5">
-                                    <span class="w-3 h-3 rounded-sm bg-emerald-400 inline-block"></span>
-                                    <span>Normal</span>
-                                </span>
-                                <span class="flex items-center gap-1.5">
-                                    <span class="w-3 h-3 rounded-sm bg-red-400 inline-block"></span>
-                                    <span>Abnormal</span>
-                                </span>
-                                <span class="flex items-center gap-1.5">
-                                    <span class="w-6 border-t-2 border-dashed border-red-500 inline-block"></span>
-                                    <span>SCL</span>
-                                </span>
-                            </div>
-                        </div>
-                        <div class="p-6 flex-1 flex flex-col justify-center">
-                            @if(count($realtimeData) > 0)
-                                <div class="h-80 w-full">
-                                    <canvas id="realtimeChart"></canvas>
-                                </div>
-                            @else
-                            <div class="h-80 flex flex-col items-center justify-center text-gray-400">
-                                <svg class="w-12 h-12 mb-3 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a２ ２ ０ ００-２ ２"/></svg>
-                                <p class="text-sm italic">No realtime data available yet.</p>
-                                <p class="text-xs mt-1">Waiting for active pattern data...</p>
-                            </div>
-                            @endif
-                        </div>
-                    </div>
-                </div>
+                <x-cycle-time.realtime-chart
+                    class="xl:col-span-2"
+                    :data="$realtimeData"
+                    :active-pattern="$activePattern"
+                />
                 {{-- Logs Card (1/3 width) --}}
-                <div class="xl:col-span-1">
-                    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden h-full flex flex-col">
-                        <div class="p-4 border-b border-gray-100 flex items-center justify-between shrink-0">
-                            <h3 class="font-bold text-gray-900 text-sm tracking-tight flex items-center gap-2">
-                                <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
-                                <span class="text-sm font-bold text-slate-700 uppercase">Recent Activity Log</span>
-                            </h3>
-                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest bg-gray-50 px-2.5 py-1 rounded-full border border-gray-150">
-                                {{ $recentLogs->total() }} entries
-                            </span>
-                        </div>
-                        <div class="overflow-y-auto flex-1">
-                            <table class="w-full text-left">
-                                <thead class="sticky top-0">
-                                    <tr class="bg-gray-50/80">
-                                        <th class="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">Time</th>
-                                        <th class="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">Pos</th>
-                                        <th class="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100 text-center">Duration</th>
-                                        <th class="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100 text-center">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-gray-50">
-                                    @forelse($recentLogs as $log)
-                                        <tr class="hover:bg-gray-50/70 transition-colors duration-150">
-                                            <td class="px-5 py-3 whitespace-nowrap">
-                                                <span class="text-xs font-medium text-gray-500">
-                                                    {{ \Carbon\Carbon::parse($log->time)->format('H:i:s') }}
-                                                </span>
-                                            </td>
-                                            <td class="px-5 py-3">
-                                                <div class="flex items-center gap-2">
-                                                    <div class="w-2 h-2 rounded-full {{ $log->status == 1 ? 'bg-emerald-400' : 'bg-red-400' }}"></div>
-                                                    <span class="text-xs font-semibold text-gray-700">{{ $log->sensor?->name }}</span>
-                                                </div>
-                                            </td>
-                                            <td class="px-5 py-3 text-center">
-                                                <span class="text-xs font-bold text-gray-900">{{ number_format($log->duration, 2) }}<span class="font-normal text-gray-400 ml-0.5">s</span></span>
-                                            </td>
-                                            <td class="px-5 py-3 text-center">
-                                                @if($log->status == 1)
-                                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 uppercase tracking-wide">
-                                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> OK
-                                                    </span>
-                                                @else
-                                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-700 uppercase tracking-wide">
-                                                        <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> NG
-                                                    </span>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="4" class="px-6 py-12 text-center">
-                                                <div class="flex flex-col items-center text-gray-400">
-                                                    <svg class="w-10 h-10 mb-2 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                                                    <p class="text-sm italic">No activity recorded yet.</p>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
-                        @if($recentLogs->hasPages())
-                        <div class="px-5 py-3 border-t border-gray-100 bg-gray-50 flex items-center justify-between text-xs">
-                            <div class="w-full relative">
-                                {{ $recentLogs->withQueryString()->links('pagination::simple-tailwind') }}
-                            </div>
-                        </div>
-                        @endif
-                    </div>
-                </div>
+                <x-cycle-time.activity-log class="xl:col-span-1" :logs="$recentActivity['logs']" :total="$recentActivity['total']" />
             </div>
             {{-- ===== HISTORICAL REPORT & FILTER ===== --}}
             <div class="mb-6">
@@ -265,32 +127,7 @@
                 </div>
             </div>
             {{-- ===== TREND CYCLETIME ===== --}}
-            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden mb-6">
-                <div class="p-4 border-b border-gray-100 flex items-center justify-between">
-                    <h3 class="font-bold text-gray-900 text-sm tracking-tight flex items-center gap-2">
-                        <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
-                        <span class="text-sm font-bold text-slate-700 uppercase">Cycle Time Trend</span>
-                    </h3>
-                    <div class="flex items-center gap-4 text-[10px] font-bold uppercase tracking-widest text-gray-400">
-                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block"></span> Normal</span>
-                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-red-400 inline-block"></span> Abnormal</span>
-                        <span class="flex items-center gap-1.5"><span class="w-6 border-t-2 border-red-500 inline-block"></span> UCL</span>
-                        <span class="flex items-center gap-1.5"><span class="w-6 border-t-2 border-amber-500 inline-block"></span> LCL</span>
-                    </div>
-                </div>
-                <div class="p-6">
-                    @if($scatterData->count() > 0)
-                    <div class="h-96 w-full">
-                        <canvas id="scatterChart"></canvas>
-                    </div>
-                    @else
-                    <div class="h-64 flex flex-col items-center justify-center text-gray-400">
-                        <svg class="w-10 h-10 mb-2 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="6" cy="6" r="1.5" fill="currentColor"/><circle cx="12" cy="10" r="1.5" fill="currentColor"/><circle cx="18" cy="4" r="1.5" fill="currentColor"/></svg>
-                        <p class="text-sm italic">No data to plot for the selected period.</p>
-                    </div>
-                    @endif
-                </div>
-            </div>
+            <x-cycle-time.trend-chart class="mb-6" :data="$scatterData" :pattern="$filterPattern" />
             {{-- ===== HOURLY SUMMARY ===== --}}
             <div class="flex items-end justify-between mb-3">
                 <div class="ml-2">
@@ -360,231 +197,16 @@
     </div>
 @endsection
 
+@pushOnce('scripts', 'chartjs-cdn')
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.1.0/dist/chartjs-plugin-annotation.min.js"></script>
+@endPushOnce
+
 @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3"></script>
     <script>
         const CdnChart = window.Chart;
 
         document.addEventListener('DOMContentLoaded', function () {
-            // ─── Chart ──────────────────────────────────────────────────────
-            @if(count($realtimeData) > 0)
-            const ctx      = document.getElementById('realtimeChart').getContext('2d');
-            const labels   = @json(collect($realtimeData)->pluck('sensor_name'));
-            const durations = @json(collect($realtimeData)->pluck('duration'));
-            const activeScl = {{ $activePattern?->cycle_time ?? 0 }};
-            const activeMaxTime = {{ $activePattern?->max_time ?? 0 }};
-
-            new CdnChart(ctx, {
-                type: 'bar',
-                data: {
-                    labels,
-                    datasets: [{
-                        label: 'Cycle Time (s)',
-                        data: durations,
-                        backgroundColor: durations.map(v => v > activeScl
-                            ? 'rgba(239,68,68,0.80)'
-                            : 'rgba(34,197,94,0.80)'),
-                        borderRadius: 8,
-                        borderWidth: 0,
-                        barThickness: 'flex',
-                        maxBarThickness: 48,
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: activeMaxTime > 0 ? activeMaxTime + 5 : undefined,
-                            grid: { color: '#f3f4f6', drawBorder: false },
-                            ticks: { font: { size: 10, weight: 'bold' }, color: '#9ca3af',
-                                    callback: v => v + 's' },
-                        },
-                        x: {
-                            grid: { display: false },
-                            ticks: { font: { size: 10, weight: '600' }, color: '#4b5563' }
-                        }
-                    },
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: '#111827',
-                            titleFont: { size: 12, weight: 'bold' },
-                            bodyFont:  { size: 12 },
-                            padding: 12,
-                            cornerRadius: 10,
-                            displayColors: false,
-                            callbacks: {
-                                label: ctx => ` ${ctx.parsed.y.toFixed(2)}s  ${ctx.parsed.y > activeScl ? '⚠ Abnormal' : '✓ Normal'}`
-                            }
-                        },
-                        annotation: {
-                            annotations: {
-                                sclLine: {
-                                    type: 'line',
-                                    yMin: activeScl,
-                                    yMax: activeScl,
-                                    borderColor: 'rgba(239,68,68,0.90)',
-                                    borderWidth: 2,
-                                    borderDash: [6, 4],
-                                    label: {
-                                        display: true,
-                                        content: 'SCL ' + activeScl + 's',
-                                        position: 'end',
-                                        backgroundColor: 'rgba(239,68,68,0.85)',
-                                        color: '#fff',
-                                        font: { size: 10, weight: 'bold' },
-                                        padding: { x: 8, y: 4 },
-                                        borderRadius: 6,
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-            @endif
-
-            // ─── Scatter Chart ───────────────────────────────────────────────
-            @if($scatterData->count() > 0)
-            const scatterCtx = document.getElementById('scatterChart')?.getContext('2d');
-            if (scatterCtx) {
-                const scatterRaw   = @json($scatterData);
-                const scatterScl   = {{ $filterPattern?->cycle_time ?? 0 }};
-                const scatterMaxTime = {{ $filterPattern?->max_time ?? 0 }};
-                const scatterMinTime = {{ $filterPattern?->min_time ?? 0 }};
-                const scatterLabels = scatterRaw.map(d => d.x);
-                const scatterPoints = scatterRaw.map((d, i) => ({ x: i, y: Number(d.y) }));
-                const scatterColors = scatterRaw.map(d => d.status == 1
-                    ? 'rgba(34,197,94,0.65)'
-                    : 'rgba(239,68,68,0.75)');
-
-                // ── Moving Average ──
-                const MA_WINDOW = 30; // jumlah titik per rata-rata, ubah sesuai kebutuhan
-
-                function movingAverage(values, windowSize) {
-                    return values.map((_, i) => {
-                        const start = Math.max(0, i - windowSize + 1);
-                        const slice = values.slice(start, i + 1);
-                        return slice.reduce((a, b) => a + b, 0) / slice.length;
-                    });
-                }
-
-                const maValues = movingAverage(scatterPoints.map(p => p.y), MA_WINDOW);
-                const maPoints = maValues.map((y, i) => ({ x: i, y }));
-
-                new CdnChart(scatterCtx, {
-                    type: 'scatter',
-                    data: {
-                        datasets: [{
-                            label: 'Cycle Time',
-                            data: scatterPoints,
-                            backgroundColor: scatterColors,
-                            pointRadius: 2,
-                            pointHoverRadius: 5,
-                            order: 2,
-                        },
-                        {
-                        type: 'line',
-                        label: 'MA ' + MA_WINDOW,
-                        data: maPoints,
-                        borderColor: 'rgba(59,130,246,0.95)', // biru
-                        borderWidth: 2,
-                        pointRadius: 0,
-                        pointHoverRadius: 0,
-                        tension: 0.3,
-                        fill: false,
-                        order: 0,
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            x: {
-                                type: 'linear',
-                                ticks: {
-                                    font: { size: 10 }, color: '#6b7280',
-                                    callback: v => scatterLabels[v] ?? v,
-                                    maxTicksLimit: 12,
-                                },
-                                grid: { color: '#f3f4f6' }
-                            },
-                            y: {
-                                beginAtZero: true,
-                                max: scatterMaxTime > 0 ? scatterMaxTime + 20 : undefined,
-                                grid: { color: '#f3f4f6', drawBorder: false },
-                                ticks: { font: { size: 10, weight: 'bold' }, color: '#9ca3af',
-                                        callback: v => v + 's' },
-                            }
-                        },
-                        plugins: {
-                            legend: { display: false },
-                            datalabels: { display: false },
-                            tooltip: {
-                                backgroundColor: '#111827',
-                                titleFont: { size: 11, weight: 'bold' },
-                                bodyFont: { size: 11 },
-                                padding: 10,
-                                cornerRadius: 8,
-                                displayColors: false,
-                                callbacks: {
-                                    title: items => scatterLabels[items[0].parsed.x] ?? '',
-                                    label: item => {
-                                        if (item.datasetIndex === 1) {
-                                            return ` MA ${MA_WINDOW}: ${item.parsed.y.toFixed(2)}s`;
-                                        }
-                                        const d = scatterRaw[item.parsed.x];
-                                        return ` ${d.sensor} · ${item.parsed.y.toFixed(2)}s  ${item.parsed.y > scatterScl ? '⚠ Abnormal' : '✓ Normal'}`;
-                                    }
-                                }
-                            },
-                            annotation: {
-                                annotations: {
-                                    uclScatter: {
-                                        type: 'line',
-                                        yMin: scatterMaxTime,
-                                        yMax: scatterMaxTime,
-                                        borderColor: 'rgba(239,68,68,0.85)',
-                                        borderWidth: 2,
-                                        label: {
-                                            display: false,
-                                            content: 'UCL ' + scatterMaxTime + 's',
-                                            position: 'end',
-                                            backgroundColor: 'rgba(239,68,68,0.85)',
-                                            color: '#fff',
-                                            font: { size: 10, weight: 'bold' },
-                                            padding: { x: 8, y: 4 },
-                                            borderRadius: 6,
-                                        }
-                                    },
-                                    lclScatter: {
-                                        type: 'line',
-                                        yMin: scatterMinTime,
-                                        yMax: scatterMinTime,
-                                        borderColor: 'rgba(239,68,68,0.85)',
-                                        borderWidth: 2,
-                                        label: {
-                                            display: false,
-                                            content: 'LCL ' + scatterMinTime + 's',
-                                            position: 'end',
-                                            backgroundColor: 'rgba(239,68,68,0.85)',
-                                            color: '#fff',
-                                            font: { size: 10, weight: 'bold' },
-                                            padding: { x: 8, y: 4 },
-                                            borderRadius: 6,
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-            @endif
-
             // ─── Hourly Summary Charts ─────────────────────────────────────────
             const summaryChartData = @json($summaryData);
             const tactTimeScl = {{ $filterPattern?->cycle_time ?? 0 }};

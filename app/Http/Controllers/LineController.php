@@ -46,8 +46,14 @@ class LineController extends Controller
             'selected_line_name' => $line->name,
         ]);
 
-        return redirect()->route('system-managers.index')
-            ->with('success', "{$line->name} berhasil dipilih. Selamat datang di System Manager!");
+        // Hanya admin & leader yang boleh masuk System Manager
+        if (in_array(Auth::user()->role, ['admin', 'leader'])) {
+            return redirect()->route('system-managers.index')
+                ->with('success', "{$line->name} berhasil dipilih. Selamat datang di System Manager!");
+        }
+
+        return redirect()->route('dashboards.index')
+            ->with('success', "{$line->name} berhasil dipilih.");
     }
 
     /**

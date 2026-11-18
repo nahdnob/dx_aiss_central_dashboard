@@ -8,6 +8,18 @@ use App\Models\Pattern;
 class PatternSeeder extends Seeder
 {
     /**
+     * Batas bawah data yang ditampilkan (detik), per nama pattern.
+     * Tidak boleh melebihi min_time (LCL), supaya NG "terlalu cepat" yang asli tetap terlihat.
+     */
+    public const EXCEPT_TIMES = [
+        '3MP' => 10,
+        '4MP' => 10,
+        '5MP' => 10,
+        '6MP' => 10,
+        '7MP' => 9,
+    ];
+
+    /**
      * Run the database seeds.
      *
      * Idempotent — see SensorSeeder for why (fresh install vs. backfilled DB).
@@ -30,7 +42,10 @@ class PatternSeeder extends Seeder
             }
 
             foreach ($patterns as $pattern) {
-                Pattern::create($pattern + ['line_id' => $lineId]);
+                Pattern::create($pattern + [
+                    'line_id'     => $lineId,
+                    'except_time' => self::EXCEPT_TIMES[$pattern['name']] ?? 0,
+                ]);
             }
         }
     }

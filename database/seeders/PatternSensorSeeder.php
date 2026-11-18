@@ -53,6 +53,7 @@ class PatternSensorSeeder extends Seeder
                         'pattern_id' => $pattern->id,
                         'sensor_id'  => $sensorIds[$pos - 1],
                         'pos'        => $pos,
+                        'cycle'      => 1,
                         'created_at' => $now,
                         'updated_at' => $now,
                     ];

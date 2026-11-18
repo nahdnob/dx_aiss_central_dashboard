@@ -1,7 +1,7 @@
-@props(['dayCount', 'lastDay'])
+@props(['dayCount', 'lastDay', 'fluid' => false])
 
 <!-- Outer Card -->
-<div class="min-w-80 w-auto p-1 rounded-[28px] bg-gradient-to-r from-yellow-300 via-orange-400 to-yellow-300 shadow-xl">
+<div {{ $attributes->class(['min-w-80 p-1 rounded-[28px] bg-gradient-to-r from-yellow-300 via-orange-400 to-yellow-300 shadow-xl', 'w-full' => $fluid, 'w-auto' => !$fluid]) }}>
     <!-- Inner Card -->
     <div class="w-full p-5 bg-yellow-50 rounded-3xl">
         <div class="flex items-center justify-center gap-2">

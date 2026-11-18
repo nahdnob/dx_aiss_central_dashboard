@@ -18,8 +18,10 @@ class AuthController extends Controller
     {
         // Sudah login: arahkan ke halaman sesuai status pilihan line
         if (Auth::check()) {
+            $canManage = in_array(Auth::user()->role, ['admin', 'leader']);
+
             return redirect()->route(
-                session('selected_line_id') ? 'system-managers.index' : 'dashboards.index'
+                session('selected_line_id') && $canManage ? 'system-managers.index' : 'dashboards.index'
             );
         }
 

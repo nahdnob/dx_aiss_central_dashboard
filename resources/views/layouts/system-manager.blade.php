@@ -18,6 +18,8 @@
         @yield('content')
     </main>
 
+    <x-ui.scroll-control />
+
     @auth
         <x-modal id="profile-modal" maxWidth="max-w-md">
             <x-ui.profile-card

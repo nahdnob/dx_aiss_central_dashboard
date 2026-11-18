@@ -43,6 +43,7 @@ class ProductInService
             }
 
             $this->processFile($line, $folderDate, $filePath);
+            SyncState::markCaughtUp(SyncState::IN, $line->id);
             return;
         }
 
@@ -50,7 +51,11 @@ class ProductInService
         $nowDate  = $today->toDateString();
 
         if ($lastDate !== $nowDate) {
+            // Selama kalibrasi berjalan, WIP belum boleh ditutup otomatis.
+            // Jika kalibrasi gagal di tengah jalan, status tetap "belum caught up".
+            SyncState::markCalibrating(SyncState::IN, $line->id);
             $this->calibrate($line, $lastData, $lastDate, $nowDate);
+            SyncState::markCaughtUp(SyncState::IN, $line->id);
             return;
         }
 
@@ -65,12 +70,14 @@ class ProductInService
         );
 
         if ($lastIndex !== false && $lastIndex === array_key_last($data)) {
+            SyncState::markCaughtUp(SyncState::IN, $line->id);
             return;
         }
 
         $startIndex = $lastIndex === false ? 0 : $lastIndex + 1;
 
         $this->processFile($line, $folderDate, $filePath, $startIndex);
+        SyncState::markCaughtUp(SyncState::IN, $line->id);
     }
 
     private function setFilePath(Line $line, $today, string $now, ?int $shiftId): ?string {
@@ -194,7 +201,7 @@ class ProductInService
     private function calibrate(Line $line, $lastData, string $lastDate, string $nowDate): int {
 
         $count    = 0;
-        $lastTime = Carbon::parse($lastData->time_out)->format('H:i:s');
+        $lastTime = Carbon::parse($lastData->time_in)->format('H:i:s');
 
         $lastFolderDate = $lastTime < $this->shifts->workdayStart()
             ? Carbon::parse($lastDate)->subDay()->toDateString()
@@ -221,13 +228,14 @@ class ProductInService
                     $data = file($filePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 
                     $foundIndex = collect($data)->search(
-                        fn ($row) => str_contains($row, $lastData->tag_id)
+                        fn ($row) => str_contains($row, $lastData->part_id)
                     );
 
                     $startIndex = ($foundIndex !== false) ? $foundIndex + 1 : 0;
                 }
 
-                $count += $this->processFile($line, $currentDate, $filePath, $startIndex);
+                $this->processFile($line, $currentDate, $filePath, $startIndex);
+                $count++;
             }
 
             $currentDate->addDay();

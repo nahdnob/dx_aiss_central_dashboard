@@ -15,6 +15,8 @@
     <main>
         <x-ui.main>@yield('content')</x-ui.main>
     </main>
+
+    <x-ui.scroll-control />
 </body>
 @if(session('success'))
     <script>

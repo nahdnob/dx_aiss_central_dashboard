@@ -8,15 +8,20 @@ use Carbon\Carbon;
 
 class SummaryService
 {
-    public function getScatterData($query)
+    public function getScatterData($query, $pattern = null)
     {
-        return $query->orderBy('time')
+        $posLabels = $pattern?->posLabels() ?? [];
+
+        return $query->aboveExceptTime()
+            ->whereNotNull('duration')
+            ->orderBy('time')
             ->get()
             ->map(fn($h) => [
                 'x'      => $h->time ? Carbon::parse($h->time)->format('H:i:s') : null,
                 'y'      => (float) $h->duration,
                 'status' => $h->status,
                 'sensor' => $h->sensor?->name,
+                'pos'    => $posLabels[$h->sensor_id] ?? $h->sensor?->name,
             ]);
     }
 

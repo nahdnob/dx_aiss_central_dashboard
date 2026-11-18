@@ -1,4 +1,7 @@
-@props(['headers' => []])
+@props([
+    'headers' => [],
+    'dense'   => false, {{-- true: padding header lebih rapat, untuk tabel dengan banyak kolom --}}
+])
 
 <div {{ $attributes->merge(['class' => 'bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden']) }}>
     @isset($toolbar)
@@ -12,7 +15,7 @@
             <thead>
                 <tr class="bg-gray-50 border-b border-gray-150 text-center text-gray-500 font-bold text-[10px] tracking-widest uppercase">
                     @foreach ($headers as $header)
-                        <th class="px-5 py-3">{{ $header }}</th>
+                        <th @class(['py-3', 'px-2 whitespace-nowrap' => $dense, 'px-5' => !$dense])>{{ $header }}</th>
                     @endforeach
                 </tr>
             </thead>

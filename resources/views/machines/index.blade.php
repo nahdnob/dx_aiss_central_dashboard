@@ -23,10 +23,10 @@
                             <x-form.input name="acquisition_date" label="Acq Date" type="date" required />
                             <x-form.file-input name="image_path" />
                             <x-ui.button variant="success" type="submit" class="w-full sm:w-auto">
-                                Add
                                 <svg class="w-4 h-4 text-white dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-7 7V5"/>
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                                 </svg>
+                                Add
                             </x-ui.button>
                         </div>
                     </form>

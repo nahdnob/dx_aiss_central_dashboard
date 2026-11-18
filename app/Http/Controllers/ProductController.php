@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 //import model
 use App\Models\ProductSummary;
 use App\Models\ProductIn;
+use App\Services\Production\ProductStatsService;
 use App\Services\Production\SummaryService;
 
 use Illuminate\Http\Request;
@@ -13,6 +14,7 @@ class ProductController extends Controller
 {
     public function __construct(
         private SummaryService $summaryService,
+        private ProductStatsService $statsService,
     ) {}
 
     /**
@@ -21,9 +23,17 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         return view('products.index', [
+            ...$this->statsData(),
             ...$this->summaryData(),
             ...$this->logData($request),
         ]);
+    }
+
+    public function stats()
+    {
+        return response()
+            ->view('products.partials.stats', $this->statsData())
+            ->header('Cache-Control', 'no-store');
     }
 
     public function summary()
@@ -38,6 +48,11 @@ class ProductController extends Controller
         return response()
             ->view('products.partials.log', $this->logData($request))
             ->header('Cache-Control', 'no-store');
+    }
+
+    private function statsData(): array
+    {
+        return $this->statsService->get(session('selected_line_id'));
     }
 
     private function summaryData(): array

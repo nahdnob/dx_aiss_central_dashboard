@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             // ── Sensor & Pattern ──────────────────────────────────────
             SensorSeeder::class,
             PatternSeeder::class,
+            PatternExceptTimeSeeder::class,
             PatternSensorSeeder::class,
             PatternHistorySeeder::class,
 

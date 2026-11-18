@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Models\Pattern;
 use App\Models\Sensor;
 
@@ -13,7 +14,11 @@ class PatternController extends Controller
      */
     public function index()
     {
-        $patterns = Pattern::where('line_id', session('selected_line_id'))->with('sensors:id,name')->get();
+        $patterns = Pattern::where('line_id', session('selected_line_id'))
+            ->when(request('search'), fn ($q, $search) => $q->where('name', 'like', "%{$search}%"))
+            ->with('sensors:id,name')
+            ->orderBy('name')
+            ->get();
         $sensors  = Sensor::where('line_id', session('selected_line_id'))->get();
  
         return view('cycletimes.setting.index', [
@@ -66,10 +71,11 @@ class PatternController extends Controller
         // dd($request);
         // 1️⃣ Validasi data utama
         $request->validate([
-            'name'       => 'required|regex:/^[a-zA-Z0-9\s\-]+$/|unique:patterns,name',
+            'name'       => ['required', 'regex:/^[a-zA-Z0-9\s\-]+$/', $this->uniqueNameRule()],
             'cycle_time' => 'required|numeric|min:0|max:3600',
             'max_time'   => 'required|numeric|min:0|max:3600|gt:cycle_time',
             'min_time'   => 'required|numeric|min:0|max:3600|lt:cycle_time',
+            'except_time' => 'required|numeric|min:0|max:3600|lte:min_time',
             'sensors' => 'sometimes|array',
             'sensors.*' => 'array',
             'sensors.*.pos' => 'nullable|integer|min:1',
@@ -92,6 +98,11 @@ class PatternController extends Controller
             'min_time.min'        => 'Durasi minimum minimal 0 detik.',
             'min_time.max'        => 'Durasi minimum maksimal 3600 detik.',
             'min_time.lt'         => 'Durasi minimum harus lebih kecil dari limit durasi.',
+            'except_time.required' => 'Except time wajib diisi.',
+            'except_time.numeric'  => 'Except time harus berupa angka.',
+            'except_time.min'      => 'Except time minimal 0 detik.',
+            'except_time.max'      => 'Except time maksimal 3600 detik.',
+            'except_time.lte'      => 'Except time tidak boleh lebih besar dari durasi minimum.',
         ]);
         
         // 2️⃣ Simpan data pattern
@@ -100,6 +111,7 @@ class PatternController extends Controller
             'cycle_time' => $request->cycle_time,
             'max_time'   => $request->max_time,
             'min_time'   => $request->min_time,
+            'except_time' => $request->except_time,
             'line_id'    => session('selected_line_id'),
         ]);
 
@@ -134,7 +146,7 @@ class PatternController extends Controller
     public function edit(string $id)
     {
         $pattern = Pattern::with('sensors:id')
-                          ->select('id', 'name', 'cycle_time', 'max_time', 'min_time')
+                          ->select('id', 'name', 'cycle_time', 'max_time', 'min_time', 'except_time')
                           ->findOrFail($id);
 
         // Cek apakah request AJAX
@@ -155,10 +167,11 @@ class PatternController extends Controller
 
         // 2️⃣ Validasi input
         $request->validate([
-            'name'       => "required|regex:/^[a-zA-Z0-9\s\-]+$/|unique:patterns,name,{$id}",
+            'name'       => ['required', 'regex:/^[a-zA-Z0-9\s\-]+$/', $this->uniqueNameRule($pattern->line_id)->ignore($pattern->id)],
             'cycle_time' => 'required|numeric|min:0|max:3600',
             'max_time'   => 'required|numeric|min:0|max:3600|gt:cycle_time',
             'min_time'   => 'required|numeric|min:0|max:3600|lt:cycle_time',
+            'except_time' => 'required|numeric|min:0|max:3600|lte:min_time',
             'sensors' => 'sometimes|array',
             'sensors.*' => 'array',
             'sensors.*.pos' => 'nullable|integer|min:1',
@@ -181,6 +194,11 @@ class PatternController extends Controller
             'min_time.min'        => 'Durasi minimum minimal 0 detik.',
             'min_time.max'        => 'Durasi minimum maksimal 3600 detik.',
             'min_time.lt'         => 'Durasi minimum harus lebih kecil dari limit durasi.',
+            'except_time.required' => 'Except time wajib diisi.',
+            'except_time.numeric'  => 'Except time harus berupa angka.',
+            'except_time.min'      => 'Except time minimal 0 detik.',
+            'except_time.max'      => 'Except time maksimal 3600 detik.',
+            'except_time.lte'      => 'Except time tidak boleh lebih besar dari durasi minimum.',
         ]);
 
         // 3️⃣ Update data utama pattern
@@ -189,6 +207,7 @@ class PatternController extends Controller
             'cycle_time' => $request->cycle_time,
             'max_time'   => $request->max_time,
             'min_time'   => $request->min_time,
+            'except_time' => $request->except_time,
         ]);
 
         // 4️⃣ Sinkronisasi pivot pattern_sensor dengan kolom tambahan 'pos'
@@ -224,5 +243,13 @@ class PatternController extends Controller
 
         // 4. Redirect ke halaman index dengan pesan sukses
         return redirect()->route('cycletimes.setting.index')->with('success', 'Pattern berhasil dihapus.');
+    }
+
+    /**
+     * Nama pattern unik per line (line lain boleh memakai nama yang sama).
+     */
+    private function uniqueNameRule(?int $lineId = null)
+    {
+        return Rule::unique('patterns', 'name')->where('line_id', $lineId ?? session('selected_line_id'));
     }
 }

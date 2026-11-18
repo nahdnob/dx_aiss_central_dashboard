@@ -11,6 +11,7 @@ class Pattern extends Model
         'cycle_time',
         'max_time',
         'min_time',
+        'except_time',
         'line_id',
     ];
 
@@ -22,6 +23,16 @@ class Pattern extends Model
     // Relation to Sensors - Many to Many
     public function sensors(){
         return $this->belongsToMany(Sensor::class, 'pattern_sensor')->withPivot('pos', 'cycle')->withTimestamps();
+    }
+
+    /**
+     * Label POS tiap sensor pada pattern ini: [sensor_id => 'POS n'].
+     */
+    public function posLabels(): array
+    {
+        return $this->sensors
+            ->mapWithKeys(fn ($sensor) => [$sensor->id => 'POS ' . $sensor->pivot->pos])
+            ->all();
     }
 
     // Relation to Sensor Summaries - has Many

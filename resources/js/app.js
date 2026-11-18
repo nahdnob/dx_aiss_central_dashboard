@@ -13,6 +13,7 @@ import Modal from './modal'
 import Toast from './toast'
 import initSearchableDropdowns from './searchable-dropdown';
 import initToggleList from './toggle-list';
+import scrollControl from './scroll-control';
 
 const toast = new Toast();
 
@@ -36,6 +37,9 @@ document.addEventListener("DOMContentLoaded", () => {
     initSearchableDropdowns();
     initToggleList();
 })
+
+// Alpine Components
+Alpine.data('scrollControl', scrollControl)
 
 // Start Alpine
 Alpine.start()

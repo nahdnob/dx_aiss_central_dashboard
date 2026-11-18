@@ -61,6 +61,7 @@ Route::middleware('auth')->group(function () {
         Route::middleware('line.selected')->group(function () {
             Route::resource('best-records', BestRecordController::class);
             Route::resource('line-performance', LinePerformanceController::class);
+            Route::get('/products/stats', [ProductController::class, 'stats'])->name('products.stats');
             Route::get('/products/summary', [ProductController::class, 'summary'])->name('products.summary');
             Route::get('/products/log', [ProductController::class, 'log'])->name('products.log');
             Route::resource('products', ProductController::class);
