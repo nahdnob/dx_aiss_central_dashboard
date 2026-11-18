@@ -27,6 +27,10 @@ export default function scrollControl({
         _holdUntil: 0,
 
         init() {
+            // Pilihan jeda/jalan user tetap dipakai setelah halaman di-reload (meta refresh)
+            const saved = readSaved()
+            if (saved !== null) this.auto = saved
+
             this.measure()
             this._pos = window.scrollY
 
@@ -116,6 +120,26 @@ export default function scrollControl({
             this.auto = !this.auto
             this._pos = window.scrollY
             this._holdUntil = 0
+            saveState(this.auto)
         },
+    }
+}
+
+const STORAGE_KEY = 'scrollControl.auto'
+
+function readSaved() {
+    try {
+        const v = localStorage.getItem(STORAGE_KEY)
+        return v === null ? null : v === '1'
+    } catch {
+        return null
+    }
+}
+
+function saveState(auto) {
+    try {
+        localStorage.setItem(STORAGE_KEY, auto ? '1' : '0')
+    } catch {
+        // storage tidak tersedia (private mode, dll) — abaikan
     }
 }

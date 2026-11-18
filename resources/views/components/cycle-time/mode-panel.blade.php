@@ -8,7 +8,8 @@
 {{-- Quick control mode (pattern) + info mode aktif, full width (gaya sama dengan filter Historical Report) --}}
 <div {{ $attributes->merge(['class' => 'bg-white rounded-2xl border border-gray-200 shadow-sm p-5']) }}>
     <div class="flex flex-wrap items-end justify-between gap-4">
-        {{-- Ubah mode --}}
+        {{-- Ubah mode (hanya admin & leader) --}}
+        @if (in_array(auth()->user()?->role, ['admin', 'leader']))
         <form action="{{ route('pattern-histories.store') }}" method="POST" class="flex flex-wrap items-end gap-4">
             @csrf
             <input type="hidden" name="line_id" value="{{ session('selected_line_id') }}">
@@ -26,6 +27,7 @@
                 Apply
             </button>
         </form>
+        @endif
 
         {{-- Info mode aktif --}}
         <div class="flex flex-wrap items-end gap-4">

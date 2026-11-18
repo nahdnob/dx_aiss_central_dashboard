@@ -2,9 +2,14 @@
      supaya header sticky menempel di atas area scroll tersebut.
      Tinggi TETAP: header 56px + baris 74px. Garis pemisah memakai inset shadow
      (tidak menambah tinggi), sehingga 6 baris = 56 + 6 x 74 = 500px.
-     Jika tinggi ini diubah, sesuaikan juga h-[500px] di system-managers/index. --}}
+     Jika tinggi ini diubah, sesuaikan juga h-[500px] di system-managers/index.
+     Tinggi baris bisa diperbesar container lewat CSS var --wip-row-h (default 74px).
+     Jika data < 6, sisa baris diisi baris kosong agar tabel tetap penuh. --}}
+@php
+    $minRows  = 6;
+    $rowClass = 'h-[var(--wip-row-h,74px)] bg-white shadow-[inset_0_-1px_0_#e5e7eb]';
+@endphp
 <div class="relative sm:rounded-lg">
-@if (count($products) > 0)
     <table class="w-full text-sm text-left text-gray-500">
         <thead class="sticky top-0 z-10 text-xs font-bold text-white uppercase bg-gray-700 shadow-[inset_0_-2px_0_#1f2937]">
             <tr class="h-14">
@@ -17,7 +22,7 @@
         </thead>
         <tbody>
 			@foreach ($products as $product)
-				<tr class="h-[74px] bg-white shadow-[inset_0_-1px_0_#e5e7eb]">
+				<tr class="{{ $rowClass }}">
 					<th scope="row" class="px-6 py-0">
 						<p class="font-medium text-lg text-slate-700 whitespace-nowrap">
 							{{ $product['part_number'] }}
@@ -64,11 +69,27 @@
 					</td>
 				</tr>
 			@endforeach
+
+			@if (count($products) === 0)
+				<tr class="{{ $rowClass }}">
+					<td colspan="5" class="px-6 py-0 text-center text-lg font-semibold text-red-600">
+						TIDAK ADA PRODUK DI WIP!
+					</td>
+				</tr>
+			@endif
+
+			{{-- Baris kosong pengisi sampai minimal 6 baris --}}
+			@for ($i = max(count($products), 1); $i < $minRows; $i++)
+				<tr class="{{ str_replace('bg-white', 'bg-slate-50', $rowClass) }}">
+					<td colspan="5" class="px-6 py-0 text-center">
+						<span class="inline-flex items-center gap-2 text-sm font-semibold tracking-[0.3em] uppercase text-slate-300">
+							<span class="h-px w-10 bg-slate-200"></span>
+							Empty
+							<span class="h-px w-10 bg-slate-200"></span>
+						</span>
+					</td>
+				</tr>
+			@endfor
         </tbody>
     </table>
-@else
-	<div class="alert alert-danger text-center text-red-600">
-		TIDAK ADA PRODUK DI WIP!
-	</div>
-@endif
 </div>

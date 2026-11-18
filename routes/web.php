@@ -32,6 +32,8 @@ Route::middleware('auth')->group(function () {
     // Features available to every signed-in role.
     Route::middleware('role:admin,leader,user')->group(function () {
         Route::resource('dashboards', DashboardController::class);
+        // Halaman utama setelah login untuk semua role (sidebar menyesuaikan role).
+        Route::get('/system-managers', [SystemManagerController::class, 'index'])->name('system-managers.index');
         Route::get('/select-line', [LineController::class, 'index'])->name('line-selector.index');
         Route::post('/clear-line', [LineController::class, 'clear'])->name('line-selector.clear');
 
@@ -47,6 +49,9 @@ Route::middleware('auth')->group(function () {
             Route::get('/sops', [SopController::class, 'index'])->name('sops.index');
             Route::get('/risk-assessments', [RiskAssessmentController::class, 'index'])->name('risk-assessments.index');
 
+            // Kartu statistik produksi di halaman Home (read-only).
+            Route::get('/products/stats', [ProductController::class, 'stats'])->name('products.stats');
+
             Route::get('/cycletimes/monitoring', [CycleTimeController::class, 'index'])->name('cycletimes.monitoring.index');
             Route::get('/cycletimes/monitoring/export-csv', [CycleTimeController::class, 'exportCsv'])->name('cycletimes.monitoring.export-csv');
             Route::get('/cycletimes/monitoring/export-pdf', [CycleTimeController::class, 'exportPdf'])->name('cycletimes.monitoring.export-pdf');
@@ -55,13 +60,11 @@ Route::middleware('auth')->group(function () {
 
     // Data management shared by admins and leaders.
     Route::middleware('role:admin,leader')->group(function () {
-        Route::get('/system-managers', [SystemManagerController::class, 'index'])->name('system-managers.index');
         Route::resource('pattern-histories', PatternHistoryController::class);
 
         Route::middleware('line.selected')->group(function () {
             Route::resource('best-records', BestRecordController::class);
             Route::resource('line-performance', LinePerformanceController::class);
-            Route::get('/products/stats', [ProductController::class, 'stats'])->name('products.stats');
             Route::get('/products/summary', [ProductController::class, 'summary'])->name('products.summary');
             Route::get('/products/log', [ProductController::class, 'log'])->name('products.log');
             Route::resource('products', ProductController::class);

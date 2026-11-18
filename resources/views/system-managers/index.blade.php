@@ -12,7 +12,7 @@
         {{-- ===== OVERVIEW & PRODUCTION ===== --}}
         {{-- Kolom kiri lebar tetap, kolom kanan mengambil sisa ruang. Setinggi layar (xl+):
              sisa tinggi hanya diberikan ke Line Performance (kiri) dan tabel WIP (kanan). --}}
-        <div class="grid grid-cols-1 xl:grid-cols-[360px_minmax(0,1fr)] 2xl:grid-cols-[400px_minmax(0,1fr)] gap-4 xl:min-h-[calc(100vh-9rem)]">
+        <div class="grid grid-cols-1 xl:grid-cols-[360px_minmax(0,1fr)] 2xl:grid-cols-[400px_minmax(0,1fr)] gap-4 xl:min-h-[calc(100vh-6rem)]">
             {{-- Kolom kiri: Best Record, Line Performance, Security Rank --}}
             <div class="flex flex-col gap-4">
                 <x-dashboard.best-record
@@ -36,20 +36,23 @@
                         @include('products.partials.stats', ['compact' => true])
                     </x-auto-refresh>
 
-                    {{-- Area tabel tetap: tepat 6 baris WIP (header 56px + 6 x 74px = 500px, lihat product-table).
-                         Lebih dari 6 baris → scroll di dalam area tsb, header tabel tetap (sticky).
-                         Card-nya sendiri (xl+) mengisi sisa tinggi kolom agar jarak ke teks berjalan = gap-4. --}}
+                    {{-- Area tabel: 6 baris WIP (header 56px + 6 x 74px = 500px, lihat product-table).
+                         xl+: area tabel mengisi sisa tinggi card, dan tinggi tiap baris dibagi rata
+                         (container query: (tinggi area - header) / 6) sehingga tidak ada ruang kosong.
+                         Lebih dari 6 baris → scroll di dalam area tsb, header tabel tetap (sticky). --}}
                     <x-ui.card class="shrink-0 xl:flex-1 overflow-hidden flex flex-col">
                         <div class="px-4 py-4 border-b border-gray-100 flex items-center justify-between shrink-0">
                             <h3 class="font-bold text-gray-900 text-sm tracking-tight flex items-center gap-2">
                                 <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
                                 <span class="text-sm font-bold text-slate-700 uppercase">Work in Progress</span>
                             </h3>
-                            <a href="{{ route('products.index') }}" class="text-xs font-bold text-red-600 hover:underline uppercase tracking-wide">
-                                View Production &rarr;
-                            </a>
+                            @if (in_array(auth()->user()?->role, ['admin', 'leader']))
+                                <a href="{{ route('products.index') }}" class="text-xs font-bold text-red-600 hover:underline uppercase tracking-wide">
+                                    View Production &rarr;
+                                </a>
+                            @endif
                         </div>
-                        <x-auto-refresh :url="route('products.fetchTable')" :interval="10000" class="block h-[500px] overflow-auto">
+                        <x-auto-refresh :url="route('products.fetchTable')" :interval="10000" class="block h-[500px] overflow-auto [container-type:size] xl:h-auto xl:min-h-[500px] xl:flex-1 xl:[--wip-row-h:max(74px,calc((100cqh-56px)/6))]">
                             @include('dashboards.partials.product-table', ['products' => $products])
                         </x-auto-refresh>
                     </x-ui.card>

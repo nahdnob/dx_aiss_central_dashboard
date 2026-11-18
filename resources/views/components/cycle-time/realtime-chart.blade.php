@@ -51,8 +51,8 @@
 </div>
 
 @pushOnce('scripts', 'chartjs-cdn')
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.1.0/dist/chartjs-plugin-annotation.min.js"></script>
+    <script src="{{ asset('vendor/chartjs/chart.umd.min.js') }}"></script>
+    <script src="{{ asset('vendor/chartjs/chartjs-plugin-annotation.min.js') }}"></script>
 @endPushOnce
 
 @if (count($data) > 0)
@@ -70,8 +70,31 @@
                     const activeScl     = {{ $activePattern?->cycle_time ?? 0 }};
                     const activeMaxTime = {{ $activePattern?->max_time ?? 0 }};
 
+                    // Tampilkan nilai cycle time di tengah setiap bar
+                    const barValueLabels = {
+                        id: 'barValueLabels',
+                        afterDatasetsDraw(chart) {
+                            const { ctx } = chart;
+                            const meta = chart.getDatasetMeta(0);
+                            ctx.save();
+                            ctx.font = 'bold 11px sans-serif';
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'middle';
+                            ctx.fillStyle = '#ffffff';
+                            meta.data.forEach((bar, i) => {
+                                const value = durations[i];
+                                if (value === null || value === undefined) return;
+                                // Lewati bar yang terlalu pendek untuk memuat teks
+                                if (bar.base - bar.y < 18) return;
+                                ctx.fillText(Number(value).toFixed(1) + 's', bar.x, (bar.y + bar.base) / 2);
+                            });
+                            ctx.restore();
+                        }
+                    };
+
                     new CdnChart(canvas.getContext('2d'), {
                         type: 'bar',
+                        plugins: [barValueLabels],
                         data: {
                             labels,
                             datasets: [{
@@ -82,8 +105,9 @@
                                     : 'rgba(34,197,94,0.80)'),
                                 borderRadius: 8,
                                 borderWidth: 0,
-                                barThickness: 'flex',
-                                maxBarThickness: 48,
+                                barPercentage: 0.9,
+                                categoryPercentage: 0.9,
+                                maxBarThickness: 72,
                             }]
                         },
                         options: {

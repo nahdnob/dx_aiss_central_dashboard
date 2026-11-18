@@ -35,8 +35,8 @@
 </div>
 
 @pushOnce('scripts', 'chartjs-cdn')
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.1.0/dist/chartjs-plugin-annotation.min.js"></script>
+    <script src="{{ asset('vendor/chartjs/chart.umd.min.js') }}"></script>
+    <script src="{{ asset('vendor/chartjs/chartjs-plugin-annotation.min.js') }}"></script>
 @endPushOnce
 
 @if (count($data) > 0)

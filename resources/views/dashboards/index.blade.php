@@ -245,9 +245,9 @@
 			<x-auth.login-form />
 		</x-modal>
 	<script src="https://cdn.jsdelivr.net/npm/@tailwindplus/elements@1" type="module"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <script src="{{ asset('vendor/chartjs/chart.umd.min.js') }}"></script>
+    <script src="{{ asset('vendor/chartjs/chartjs-plugin-annotation.min.js') }}"></script>
+    <script src="{{ asset('vendor/chartjs/chartjs-plugin-datalabels.min.js') }}"></script>
 	<script src="https://unpkg.com/flowbite@latest/dist/flowbite.min.js"></script>
 
 	<script> // Main Chart

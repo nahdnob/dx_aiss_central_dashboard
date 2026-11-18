@@ -1,3 +1,10 @@
+@php
+    // Hak akses menu: user → hanya Home, leader → semua kecuali User, admin → semua
+    $role       = auth()->user()?->role;
+    $canManage  = in_array($role, ['admin', 'leader']);
+    $isAdmin    = $role === 'admin';
+@endphp
+
 <aside class="group fixed top-0 left-0 z-40 h-full w-14 hover:w-56 overflow-hidden bg-white border-r border-gray-100 shadow-sm transition-[width] duration-300 ease-in-out" aria-label="Sidebar">
 
     {{-- Logo area --}}
@@ -16,13 +23,14 @@
     <nav class="px-2 pt-4 space-y-1">
 
         {{-- Home --}}
-        <x-layout.sidebar.partials.link :href="route('system-managers.index')" :active="request()->is('/')" title="Home">
+        <x-layout.sidebar.partials.link :href="route('system-managers.index')" :active="request()->routeIs('system-managers.*')" title="Home">
             <x-slot:icon>
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l9-9 9 9M5 10v9a1 1 0 001 1h4v-5h4v5h4a1 1 0 001-1v-9"/>
             </x-slot:icon>
             Home
         </x-layout.sidebar.partials.link>
 
+        @if ($canManage)
         <hr class="my-2 border-gray-200">
 
         {{-- Best Record --}}
@@ -77,9 +85,11 @@
             Production
         </x-layout.sidebar.partials.link>
 
-        <hr class="my-2 border-rose-400">
+        @endif
 
-        @if(auth()->user()?->role === 'admin')
+        @if ($isAdmin)
+            <hr class="my-2 border-rose-400">
+
             <x-layout.sidebar.partials.link :href="route('users.index')" :active="request()->is('users*')" title="User">
                 <x-slot:icon>
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
@@ -87,17 +97,21 @@
                 User
             </x-layout.sidebar.partials.link>
         @endif
-
-        
     </nav>
 
-    {{-- Back (bottom) --}}
+    {{-- Logout (bottom) --}}
     <div class="absolute bottom-4 left-0 right-0 px-2">
-        <x-layout.sidebar.partials.link :href="route('dashboards.index')" title="Back to Dashboard" class="w-full">
-            <x-slot:icon>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-            </x-slot:icon>
-            Back
-        </x-layout.sidebar.partials.link>
+        <form method="POST" action="{{ route('logout') }}">
+            @csrf
+            <button type="submit" title="Logout"
+                    class="w-full flex items-center gap-3 px-2.5 py-2 rounded-[10px] transition-colors duration-150 cursor-pointer text-gray-500 hover:bg-red-500/[0.08] hover:text-red-600">
+                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                </svg>
+                <span class="text-sm font-semibold opacity-0 w-0 overflow-hidden whitespace-nowrap transition-all duration-200 group-hover:opacity-100 group-hover:w-auto">
+                    Logout
+                </span>
+            </button>
+        </form>
     </div>
 </aside>
