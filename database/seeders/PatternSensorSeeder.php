@@ -30,8 +30,17 @@ class PatternSensorSeeder extends Seeder
             '7MP' => 7,
         ];
 
-        foreach (Line::pluck('id') as $lineId) {
+        // Cycle khusus per line → pattern → pos sensor (default: 1).
+        // Sensor dengan cycle 2 dilewati 2x dalam satu siklus pattern.
+        $cycleOverrides = [
+            'Assy Line 2' => [
+                '6MP' => [1 => 2, 5 => 2],
+            ],
+        ];
 
+        foreach (Line::get(['id', 'name']) as $line) {
+
+            $lineId    = $line->id;
             $sensorIds = Sensor::where('line_id', $lineId)->orderBy('id')->pluck('id')->values();
 
             foreach (Pattern::where('line_id', $lineId)->get(['id', 'name']) as $pattern) {
@@ -53,7 +62,7 @@ class PatternSensorSeeder extends Seeder
                         'pattern_id' => $pattern->id,
                         'sensor_id'  => $sensorIds[$pos - 1],
                         'pos'        => $pos,
-                        'cycle'      => 1,
+                        'cycle'      => $cycleOverrides[$line->name][$pattern->name][$pos] ?? 1,
                         'created_at' => $now,
                         'updated_at' => $now,
                     ];

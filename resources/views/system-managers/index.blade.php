@@ -114,4 +114,6 @@
     </div>
     <x-layout.footer />
 </div>
+
+<x-ui.scroll-control />
 @endsection
