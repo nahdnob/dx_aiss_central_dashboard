@@ -9,6 +9,7 @@ use App\Models\Shift;
 
 use App\Services\Production\FifoService;
 use App\Services\Production\SummaryService;
+use App\Support\NetworkPath;
 
 use Carbon\Carbon;
 
@@ -39,6 +40,18 @@ class ProductOutService
             $count = 0;
 
             foreach (Line::whereNotNull('kanban_path')->get() as $line) {
+
+                $access = NetworkPath::check($line->kanban_path);
+
+                if (!$access['ok']) {
+                    Log::error('[PRODUCT-OUT][PATH_UNREACHABLE]', [
+                        'line_id' => $line->id,
+                        'path'    => $line->kanban_path,
+                        'reason'  => $access['reason'],
+                    ]);
+                    continue;
+                }
+
                 $this->retryUnallocated($line);
                 $count += $this->syncLine($line);
             }
@@ -72,7 +85,7 @@ class ProductOutService
                 return 0;
             }
 
-            $count = $this->processFile($line, $folderDate, $filePath);
+            $count = $this->processFile($line, $folderDate, $shift['folder'], $filePath);
             SyncState::markCaughtUp(SyncState::OUT, $line->id);
             Log::info('[PRODUCT-OUT][SYNC_END]', ['line_id' => $line->id, 'processed' => $count, 'mode' => 'initial']);
             return $count;
@@ -110,7 +123,7 @@ class ProductOutService
 
         $startIndex = $lastIndex === false ? 0 : $lastIndex + 1;
 
-        $count = $this->processFile($line, $folderDate, $filePath, $startIndex);
+        $count = $this->processFile($line, $folderDate, $shift['folder'], $filePath, $startIndex);
         SyncState::markCaughtUp(SyncState::OUT, $line->id);
 
         Log::info('[PRODUCT-OUT][SYNC_END]', ['line_id' => $line->id, 'processed' => $count]);
@@ -147,7 +160,7 @@ class ProductOutService
                 . $shift . '\\KANBAN DATA\\Data.txt';
     }
 
-    private function processFile(Line $line, $currentDate, string $filePath, int $startIndex = 0): int {
+    private function processFile(Line $line, $currentDate, string $folder, string $filePath, int $startIndex = 0): int {
 
         if (!file_exists($filePath)) {
 
@@ -184,7 +197,7 @@ class ProductOutService
                     continue;
                 }
 
-                $changed = $this->save($line, $currentDate, $parsed);
+                $changed = $this->save($line, $currentDate, $folder, $parsed);
 
                 if ($changed !== null) {
                     $count++;
@@ -227,7 +240,7 @@ class ProductOutService
         ];
     }
 
-    private function save(Line $line, $currentDate, array $parsed): ?Collection
+    private function save(Line $line, $currentDate, string $folder, array $parsed): ?Collection
     {
         if (empty($parsed['tagId']) || empty($parsed['partNumber']) || empty($parsed['timeOut'])) {
             return null;
@@ -235,11 +248,7 @@ class ProductOutService
 
         $parsed['timeOut'] = date('H:i:s', strtotime($parsed['timeOut']));
 
-        $baseDate = $currentDate->copy();
-
-        if ($parsed['timeOut'] < $this->shifts->workdayStart()) {
-            $baseDate->addDay();
-        }
+        $baseDate = $this->shifts->resolveDate($currentDate, $folder, $parsed['timeOut']);
 
         $dateTimeOut = $baseDate->format('Y-m-d') . ' ' . $parsed['timeOut'];
 
@@ -298,7 +307,7 @@ class ProductOutService
                     $startIndex = ($foundIndex !== false) ? $foundIndex + 1 : 0;
                 }
 
-                $count += $this->processFile($line, $currentDate, $filePath, $startIndex);
+                $count += $this->processFile($line, $currentDate, $shift, $filePath, $startIndex);
             }
 
             $currentDate->addDay();

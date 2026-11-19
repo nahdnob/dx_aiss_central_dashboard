@@ -26,6 +26,6 @@ class OrganizationalStructureSeeder extends Seeder
 
         // Lines
         Line::create(['bu_id' => $bu1->id, 'name' => 'Assy Line 1']);
-        Line::create(['bu_id' => $bu1->id, 'name' => 'Assy Line 2', 'pokayoke_path' => '\\\\FU551324001\\Users\\ADMIN\\Documents\\Pokayoke\\DATA', 'kanban_path' => '\\\\192.168.2.1\\Users\\User\\Documents\\IGS']);
+        Line::create(['bu_id' => $bu1->id, 'name' => 'Assy Line 2', 'pokayoke_path' => '\\\\192.168.2.5\\Users\\ADMIN\\Documents\\Pokayoke\\DATA', 'kanban_path' => '\\\\192.168.2.1\\Users\\User\\Documents\\IGS']);
     }
 }

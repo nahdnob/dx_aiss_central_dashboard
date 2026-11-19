@@ -71,4 +71,23 @@ class ShiftResolver
     {
         return $this->load()[0]['start'];
     }
+
+    /**
+     * Tentukan tanggal sebenarnya dari jam scan di sebuah file shift.
+     *
+     * - Folder DAY: semua scan ada di tanggal folder, termasuk scan yang
+     *   dilakukan sedikit sebelum jam kerja mulai (mis. 07:32 < 07:35).
+     * - Folder NIGHT: shift melewati tengah malam, jadi jam pagi (< 12:00)
+     *   adalah hari berikutnya; jam sore/malam tetap di tanggal folder.
+     */
+    public function resolveDate(Carbon $folderDate, string $folder, string $time): Carbon
+    {
+        $date = $folderDate->copy();
+
+        if ($folder === self::FOLDERS[2] && $time < '12:00:00') {
+            $date->addDay();
+        }
+
+        return $date;
+    }
 }

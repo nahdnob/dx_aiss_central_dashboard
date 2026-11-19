@@ -7,6 +7,7 @@ use App\Models\ProductIn;
 use App\Models\ProductSummary;
 // use App\Models\Shift;
 use App\Services\Production\SummaryService;
+use App\Support\NetworkPath;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
@@ -27,6 +28,17 @@ class ProductInService
 
     private function syncLine(Line $line): void {
 
+        $access = NetworkPath::check($line->pokayoke_path);
+
+        if (!$access['ok']) {
+            Log::error('[PRODUCT-IN][PATH_UNREACHABLE]', [
+                'line_id' => $line->id,
+                'path'    => $line->pokayoke_path,
+                'reason'  => $access['reason'],
+            ]);
+            return;
+        }
+
         $today    = now();
         $shift    = $this->shifts->current($today);
         $lastData = ProductIn::where('line_id', $line->id)->orderByDesc('id')->first();
@@ -42,7 +54,7 @@ class ProductInService
                 return;
             }
 
-            $this->processFile($line, $folderDate, $filePath);
+            $this->processFile($line, $folderDate, $shift['folder'], $filePath);
             SyncState::markCaughtUp(SyncState::IN, $line->id);
             return;
         }
@@ -76,7 +88,7 @@ class ProductInService
 
         $startIndex = $lastIndex === false ? 0 : $lastIndex + 1;
 
-        $this->processFile($line, $folderDate, $filePath, $startIndex);
+        $this->processFile($line, $folderDate, $shift['folder'], $filePath, $startIndex);
         SyncState::markCaughtUp(SyncState::IN, $line->id);
     }
 
@@ -108,7 +120,7 @@ class ProductInService
                 . $shift . '\\PRODUCTION DATA\\Data Scan.txt';
     }
 
-    private function processFile(Line $line, $currentDate, string $filePath, int $startIndex = 0): void{
+    private function processFile(Line $line, $currentDate, string $folder, string $filePath, int $startIndex = 0): void{
 
         if (!file_exists($filePath)) {
             return;
@@ -122,7 +134,7 @@ class ProductInService
 
             if ($parsed && $parsed['judgement'] === 'OK') {
 
-                $product = $this->save($line, $currentDate, $parsed);
+                $product = $this->save($line, $currentDate, $folder, $parsed);
 
                 if ($product) {
                     $alreadyCovered = !$product->wasRecentlyCreated
@@ -172,16 +184,13 @@ class ProductInService
         ];
     }
 
-    private function save(Line $line, $currentDate, array $parsed, int $quantity = 2): ?ProductIn {
+    private function save(Line $line, $currentDate, string $folder, array $parsed, int $quantity = 2): ?ProductIn {
 
         if (empty($parsed['partId']) || empty($parsed['partNumber']) || empty($parsed['timeIn'])) {
             return null;
         }
 
-        $baseDate = $currentDate->copy();
-        if ($parsed['timeIn'] < $this->shifts->workdayStart()) {
-            $baseDate->addDay();
-        }
+        $baseDate = $this->shifts->resolveDate($currentDate, $folder, $parsed['timeIn']);
 
         $dateTimeIn = $baseDate->format('Y-m-d') . ' ' . $parsed['timeIn'];
 
@@ -234,7 +243,7 @@ class ProductInService
                     $startIndex = ($foundIndex !== false) ? $foundIndex + 1 : 0;
                 }
 
-                $this->processFile($line, $currentDate, $filePath, $startIndex);
+                $this->processFile($line, $currentDate, $shift, $filePath, $startIndex);
                 $count++;
             }
 

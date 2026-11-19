@@ -153,6 +153,9 @@ class ProductService
 
             } else {
                 $qty += $item['quantity'];
+                // Data terurut time_in DESC, jadi item berikutnya selalu lebih awal:
+                // simpan jam scan PERTAMA dari kelompok ini.
+                $current['time_in'] = $item['time_in'];
             }
         }
 
