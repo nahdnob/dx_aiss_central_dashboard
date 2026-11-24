@@ -1,6 +1,6 @@
 <div class="mb-6">
-    <x-layout.section-title eyebrow="Operations Input" title="New Performance Entry" />
-    <x-ui.card class="p-5">
+    <x-typography.heading eyebrow="Operations Input" title="New Performance Entry" />
+    <x-card class="p-5">
         <form action="{{ route('line-performance.store') }}" method="POST">
             @csrf
             <div class="flex flex-col sm:flex-row gap-3 items-end">
@@ -42,14 +42,14 @@
                 <x-form.input name="line-performance-actual" label="Actual (%)" type="number" value="{{ old('line-performance-actual') }}" placeholder="0.0" required min="0" max="100" step="0.1" class="w-full" />
 
                 <div class="shrink-0 w-full sm:w-auto">
-                    <x-ui.button variant="success" type="submit" class="w-full sm:w-auto">
+                    <x-button variant="success" type="submit" class="w-full sm:w-auto">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
                         </svg>
                         Add
-                    </x-ui.button>
+                    </x-button>
                 </div>
             </div>
         </form>
-    </x-ui.card>
+    </x-card>
 </div>

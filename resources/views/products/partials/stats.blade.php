@@ -1,5 +1,5 @@
 @php
-    // Compact: 4 card dalam satu baris (dashboard system manager). Dibaca juga dari query
+    // Compact: 4 card dalam satu baris (dashboard / Home). Dibaca juga dari query
     // ?compact=1 supaya tetap compact saat konten di-refresh oleh x-auto-refresh.
     $compact = $compact ?? request()->boolean('compact');
 

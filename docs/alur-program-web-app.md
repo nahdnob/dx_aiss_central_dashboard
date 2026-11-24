@@ -9,7 +9,7 @@ Aplikasi ini adalah dashboard web berbasis Laravel yang memiliki alur utama:
 1. User masuk ke halaman login.
 2. Setelah login, user diarahkan ke dashboard.
 3. Jika user belum memilih line produksi, aplikasi akan memintanya memilih line melalui session.
-4. Setelah line terpilih, user dapat mengakses modul seperti mesin, SOP, produk, document, cycle time, user management, dan system manager.
+4. Setelah line terpilih, user dapat mengakses modul seperti mesin, SOP, produk, document, cycle time, user management, dan dashboard (Home).
 5. Data utama banyak dipfilter berdasarkan `selected_line_id` pada session agar setiap line menampilkan datanya sendiri.
 
 ## 2. Entry point aplikasi
@@ -34,7 +34,7 @@ Saat user membuka aplikasi, `AuthController::showLoginForm()` dijalankan.
 Logikanya:
 
 - Jika user sudah login, aplikasi akan langsung redirect ke:
-  - `system-managers.index` jika session `selected_line_id` sudah ada
+  - `dashboards.index` jika session `selected_line_id` sudah ada
   - `dashboards.index` jika belum ada line yang dipilih
 - Jika belum login, aplikasi menampilkan halaman login dan daftar line yang tersedia.
 
@@ -73,11 +73,9 @@ Setelah login, aplikasi memerlukan konteks line aktif yang dipilih user.
 
 ### 4.1 Route pemilihan line
 
-Ada tiga route penting:
+Pemilihan line dilakukan lewat modal (di halaman login dan tombol line di navbar), dengan satu route:
 
-- `GET /select-line` -> `LineController::index()`
 - `POST /select-line` -> `LineController::select()`
-- `POST /clear-line` -> `LineController::clear()`
 
 ### 4.2 Proses pemilihan line
 
@@ -88,7 +86,7 @@ Ada tiga route penting:
 - simpan ke session:
   - `selected_line_id`
   - `selected_line_name`
-- redirect ke `system-managers.index`
+- redirect ke `dashboards.index`
 
 ### 4.3 Middleware line selection
 
@@ -112,9 +110,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('dashboards', DashboardController::class);
 
     // line selector
-    Route::get('/select-line', [LineController::class, 'index'])->name('line-selector.index');
     Route::post('/select-line', [LineController::class, 'select'])->name('line-selector.select');
-    Route::post('/clear-line', [LineController::class, 'clear'])->name('line-selector.clear');
 ```
 
 Setelah login, user bisa masuk ke dashboard dan area pemilihan line.
@@ -124,7 +120,7 @@ Setelah login, user bisa masuk ke dashboard dan area pemilihan line.
 Semua modul yang tergantung line aktif dibungkus dalam middleware `line.selected`:
 
 - machine management
-- system manager
+- dashboard (Home)
 - user management
 - best records
 - line performance
@@ -176,16 +172,16 @@ Berikut urutan data yang biasanya diambil saat dashboard dibuka:
 
 ## 8. Alur modul utama
 
-### 8.1 System Manager
+### 8.1 Dashboard (Home)
 
-`SystemManagerController::index()` mendapatkan `selected_line_id` dari session, lalu menghitung:
+`DashboardController::index()` mendapatkan `selected_line_id` dari session, lalu menghitung:
 
 - jumlah machine pada line terpilih
 - jumlah SOP pada line terpilih
 - SOP yang memiliki risk assessment
 - matriks risiko berdasarkan rank A, C, E
 
-Dengan cara ini, tampilan system manager selalu terikat ke line yang sedang aktif.
+Dengan cara ini, tampilan dashboard selalu terikat ke line yang sedang aktif.
 
 ### 8.2 Machine Management
 
@@ -241,7 +237,7 @@ Jadi ada dua sisi:
 
 Secara umum, banyak model yang dibatasi oleh `line_id` di query.
 
-Contohnya di `SystemManagerController`:
+Contohnya di `DashboardController`:
 
 ```php
 Machine::where('line_id', $lineId)->count();
@@ -259,7 +255,7 @@ flowchart TD
     A[User akses / atau /login] --> B[AuthController::showLoginForm]
     B --> C{Sudah login?}
     C -- Ya --> D{Session selected_line_id ada?}
-    D -- Ya --> E[System Manager / Dashboard]
+    D -- Ya --> E[Dashboard (Home)]
     D -- Tidak --> F[Dashboard]
     C -- Tidak --> G[Form login]
     G --> H[AuthController::login]

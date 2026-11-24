@@ -9,18 +9,18 @@
 @endphp
 
 <div {{ $attributes->merge(['class' => 'mb-6 min-w-0']) }}>
-    <x-layout.section-title eyebrow="Configuration" title="Registered Patterns" />
+    <x-typography.heading eyebrow="Configuration" title="Registered Patterns" />
     {{-- ===== TABLE PATTERN DATA ===== --}}
     <x-table :headers="$headers" dense>
         {{-- Table Header: search & add button --}}
         <x-slot:toolbar>
             <x-table.search :action="route('cycletimes.setting.index')" placeholder="Search pattern name..." />
-            <x-ui.button variant="success" data-modal-open="create-pattern-modal" class="shrink-0">
+            <x-button variant="success" data-modal-open="create-pattern-modal" class="shrink-0">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
                 </svg>
                 Add Pattern
-            </x-ui.button>
+            </x-button>
         </x-slot:toolbar>
         {{-- Table Content --}}
         @forelse ($patterns as $item)
@@ -76,29 +76,29 @@
                 </td>
                 {{-- Actions --}}
                 <td class="px-3 py-3">
-                    <x-ui.action-hover>
+                    <x-table.action-hover>
                         {{-- Button Edit --}}
-                        <x-ui.button-group variant="info" class="!rounded-full">
+                        <x-button-group variant="info" class="!rounded-full">
                             <button data-modal-open="edit-pattern-modal-{{ $item->id }}" type="button" title="Edit" class="!w-8">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                 </svg>
                             </button>
-                        </x-ui.button-group>
+                        </x-button-group>
                         {{-- Button Delete --}}
                         <form action="{{ route('cycletimes.setting.destroy', $item->id) }}" method="POST" aria-label="Delete Pattern"
                               onsubmit="return confirm('Apakah Anda yakin ingin menghapus pattern: {{ $item->name }}?')">
                             @csrf
                             @method('DELETE')
-                            <x-ui.button-group variant="danger" class="!rounded-full">
+                            <x-button-group variant="danger" class="!rounded-full">
                                 <button type="submit" title="Delete" class="!w-8">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                     </svg>
                                 </button>
-                            </x-ui.button-group>
+                            </x-button-group>
                         </form>
-                    </x-ui.action-hover>
+                    </x-table.action-hover>
                 </td>
             </tr>
         @empty

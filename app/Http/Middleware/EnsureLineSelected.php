@@ -10,13 +10,13 @@ class EnsureLineSelected
 {
     /**
      * Handle an incoming request.
-     * Jika belum memilih line, redirect ke halaman line-selector.
+     * Jika belum memilih line, redirect ke dashboard untuk memilih line.
      */
     public function handle(Request $request, Closure $next): Response
     {
         if (!session()->has('selected_line_id')) {
             return redirect()->route('dashboards.index')
-                ->with('info', 'Silakan pilih Line terlebih dahulu melalui modal pada dashboard.');
+                ->with('info', 'Silakan pilih Line terlebih dahulu melalui tombol Select Line pada dashboard.');
         }
 
         return $next($request);

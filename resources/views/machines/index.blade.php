@@ -1,20 +1,20 @@
-@extends('layouts.system-manager')
+@extends('layouts.dashboard')
 
 @section('content')
     <div class="p-4 sm:ml-16 mt-14 transition-all duration-300">
         <div class="p-4 min-h-[calc(100vh-5rem)]">
 
             {{-- ===== HERO HEADER ===== --}}
-            <x-layout.page-hero title="Machines Management">
+            <x-jumbotron title="Machines Management">
                 Status monitoring of machines on the
                 <span class="font-semibold text-red-600">AISS production line</span>.
                 Track asset numbers, acquisition dates, and documentation connections.
-            </x-layout.page-hero>
+            </x-jumbotron>
 
             {{-- ===== FORM OPERATIONS INPUT ===== --}}
             <div class="mb-6">
-                <x-layout.section-title eyebrow="Operations Input" title="Add New Machine" />
-                <x-ui.card class="p-5">
+                <x-typography.heading eyebrow="Operations Input" title="Add New Machine" />
+                <x-card class="p-5">
                     <form action="{{ route('machines.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="flex flex-col sm:flex-row gap-3 items-end">
@@ -22,22 +22,22 @@
                             <x-form.input name="asset_name" label="Asset Name" placeholder="e.g., Machine..." required />
                             <x-form.input name="acquisition_date" label="Acq Date" type="date" required />
                             <x-form.file-input name="image_path" />
-                            <x-ui.button variant="success" type="submit" class="w-full sm:w-auto">
+                            <x-button variant="success" type="submit" class="w-full sm:w-auto">
                                 <svg class="w-4 h-4 text-white dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                                 </svg>
                                 Add
-                            </x-ui.button>
+                            </x-button>
                         </div>
                     </form>
-                </x-ui.card>
+                </x-card>
             </div>
 
             {{-- ===== TABLE MACHINE DATA ===== --}}
             <div class="mb-6">
                 <div class="flex items-end justify-between mb-3">
                     {{-- Title and Description --}}
-                    <x-layout.section-title eyebrow="Machine Data" title="Machines Information" />
+                    <x-typography.heading eyebrow="Machine Data" title="Machines Information" />
                     <div class="flex items-center gap-2">
                         {{-- Button Filter --}}
                         <button class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-500 transition" disabled>
@@ -78,8 +78,8 @@
                                 </span>
                             </td>
                             <td class="px-5 py-4">
-                                <x-ui.action-hover>
-                                    <x-ui.button-group>
+                                <x-table.action-hover>
+                                    <x-button-group>
                                         <a href="{{ route('machines.show', ['id' => $item->asset_no]) }}" title="Open" target="_blank">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24">
                                                 <path stroke="currentColor" stroke-width="2" d="M21 12c0 1.2-4.03 6-9 6s-9-4.8-9-6c0-1.2 4.03-6 9-6s9 4.8 9 6Z"/>
@@ -91,21 +91,21 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                             </svg>
                                         </a>
-                                    </x-ui.button-group>
+                                    </x-button-group>
                                     {{-- Delete: group dengan 1 item, variant danger --}}
                                     <form action="{{ route('machines.destroy', ['id' => $item->asset_no]) }}" method="POST"
                                         onsubmit="return confirm('Are you sure you want to delete this machine?')">
                                         @csrf
                                         @method('DELETE')
-                                        <x-ui.button-group variant="danger" class="!rounded-full">
+                                        <x-button-group variant="danger" class="!rounded-full">
                                             <button type="submit" title="Delete" class="!w-8">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                                 </svg>
                                             </button>
-                                        </x-ui.button-group>
+                                        </x-button-group>
                                     </form>
-                                </x-ui.action-hover>
+                                </x-table.action-hover>
                             </td>
                         </tr>
                     @empty
@@ -117,6 +117,6 @@
                 </x-table>
             </div>
         </div>
-        <x-layout.footer />
+        <x-footer />
     </div>
 @endsection

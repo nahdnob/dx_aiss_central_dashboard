@@ -1,19 +1,23 @@
-@extends('layouts.system-manager')
+@extends('layouts.dashboard')
 
 @section('content')
     <div class="p-4 sm:ml-16 mt-14 transition-all duration-300">
         <div class="p-4 min-h-[calc(100vh-5rem)]">
-            {{-- ===== HERO HEADER ===== --}}
-            <x-layout.page-hero title="DASg" image="assets/images/performance.jpg" alt="DASg">
+            
+            {{-- HERO HEADER --}}
+            <x-jumbotron title="DASg" image="assets/images/performance.jpg" alt="DASg">
                 Manage DASg documents for the AISS production system.
                 <span class="font-semibold text-red-600">Add new standard details, edit, and track revisions</span>.
-            </x-layout.page-hero>
-            {{-- ===== FORM OPERATIONS INPUT ===== --}}
+            </x-jumbotron>
+
+            {{-- FORM OPERATIONS INPUT --}}
             <x-form.pages.dasg-create />
-            {{-- ===== TABLE DASG DATA ===== --}}
+
+            {{-- TABLE DASG DATA --}}
             <x-table.pages.dasg :dasgs="$dasgs" :lines="$lines" />
         </div>
-        {{-- ===== FOOTER ===== --}}
-        <x-layout.footer />
+
+        {{-- FOOTER --}}
+        <x-footer />
     </div>
 @endsection

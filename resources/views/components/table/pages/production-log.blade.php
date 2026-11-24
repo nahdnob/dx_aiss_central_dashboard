@@ -3,7 +3,7 @@
 <div>
     {{-- Title and Description --}}
     <div class="flex items-end justify-between">
-        <x-layout.section-title eyebrow="Production Log" title="Part Tracking" />
+        <x-typography.heading eyebrow="Production Log" title="Part Tracking" />
     </div>
     {{-- ===== TABLE PRODUCTION LOG ===== --}}
     <x-table :headers="['PCB ID', 'Part Number', 'Time In', 'Kanban ID', 'Time Out']">

@@ -10,17 +10,7 @@ use Illuminate\Http\Request;
 class LineController extends Controller
 {
     /**
-     * Tampilkan halaman pemilihan line.
-     */
-    public function index()
-    {
-        $lines = Line::orderBy('name')->get();
-
-        return view('line-selector.index', compact('lines'));
-    }
-
-    /**
-     * Simpan pilihan line ke session dan redirect ke system-managers.
+     * Simpan pilihan line ke session dan redirect ke dashboard (Home).
      */
     public function select(Request $request)
     {
@@ -46,18 +36,8 @@ class LineController extends Controller
             'selected_line_name' => $line->name,
         ]);
 
-        // Semua role masuk ke System Manager; menu sidebar menyesuaikan role
-        return redirect()->route('system-managers.index')
-            ->with('success', "{$line->name} berhasil dipilih. Selamat datang di System Manager!");
-    }
-
-    /**
-     * Bersihkan pilihan line dari session (ganti line).
-     */
-    public function clear()
-    {
-        session()->forget(['selected_line_id', 'selected_line_name']);
-
-        return redirect()->route('dashboards.index');
+        // Semua role masuk ke Dashboard (Home); menu sidebar menyesuaikan role
+        return redirect()->route('dashboards.index')
+            ->with('success', "{$line->name} berhasil dipilih. Selamat datang!");
     }
 }

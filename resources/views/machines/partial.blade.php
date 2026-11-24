@@ -196,7 +196,7 @@
     </div>
     <br>
     <div class="xl:px-32">
-        <x-layout.footer />
+        <x-footer />
     </div>
 </div>
 <script>

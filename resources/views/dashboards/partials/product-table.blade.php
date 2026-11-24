@@ -2,7 +2,7 @@
      supaya header sticky menempel di atas area scroll tersebut.
      Tinggi TETAP: header 56px + baris 74px. Garis pemisah memakai inset shadow
      (tidak menambah tinggi), sehingga 6 baris = 56 + 6 x 74 = 500px.
-     Jika tinggi ini diubah, sesuaikan juga h-[500px] di system-managers/index.
+     Jika tinggi ini diubah, sesuaikan juga h-[500px] di dashboards/index.
      Tinggi baris bisa diperbesar container lewat CSS var --wip-row-h (default 74px).
      Jika data < 6, sisa baris diisi baris kosong agar tabel tetap penuh. --}}
 @php

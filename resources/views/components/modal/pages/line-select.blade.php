@@ -53,7 +53,7 @@
 
                             <input type="radio" name="line_id" id="line_{{ $line->id }}" value="{{ $line->id }}"
                                 class="h-4 w-4 shrink-0 cursor-pointer border-gray-300 text-red-600 focus:ring-red-500/30"
-                                @checked((string) old('line_id', $lines->count() === 1 ? $line->id : null) === (string) $line->id)
+                                @checked((string) old('line_id', session('selected_line_id') ?? ($lines->count() === 1 ? $line->id : null)) === (string) $line->id)
                                 required>
 
                             <span class="min-w-0 flex-1">

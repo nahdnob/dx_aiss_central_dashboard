@@ -8,12 +8,12 @@
     <script src="{{ asset('ckeditor/ckeditor.js') }}"></script>
 </head>
 <body>
-    <x-ui.navbar />
+    <x-navbar />
     
-    <x-ui.header>@yield('header')</x-ui.header>
+    <x-layout.header>@yield('header')</x-layout.header>
 
     <main>
-        <x-ui.main>@yield('content')</x-ui.main>
+        <x-layout.main>@yield('content')</x-layout.main>
     </main>
 </body>
 @if(session('success'))

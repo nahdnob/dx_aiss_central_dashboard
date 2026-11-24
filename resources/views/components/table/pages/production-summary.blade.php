@@ -3,7 +3,7 @@
 <div class="mb-6">
     {{-- Title & Description --}}
     <div class="flex items-end justify-between">
-        <x-layout.section-title eyebrow="Production Monitoring" title="Production Progress" />
+        <x-typography.heading eyebrow="Production Monitoring" title="Production Progress" />
     </div>
     {{-- ===== TABLE PRODUCTION SUMMARY ===== --}}
     <x-table :headers="['Part Number', 'Time In', 'QTY In', 'Time Out', 'QTY Out', 'Flow']">

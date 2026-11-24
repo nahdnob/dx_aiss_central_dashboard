@@ -16,11 +16,9 @@ class AuthController extends Controller
     // Tampilkan form login
     public function showLoginForm()
     {
-        // Sudah login: arahkan ke halaman sesuai status pilihan line
+        // Sudah login: arahkan ke dashboard (Home)
         if (Auth::check()) {
-            return redirect()->route(
-                session('selected_line_id') ? 'system-managers.index' : 'dashboards.index'
-            );
+            return redirect()->route('dashboards.index');
         }
 
         // Ambil daftar line untuk form login
@@ -96,7 +94,8 @@ class AuthController extends Controller
                 ]);
             }
 
-            return redirect()->route('line-selector.index');
+            // Fallback non-JS: kembali ke halaman login (pemilihan line via modal)
+            return redirect()->route('login.form');
         }
 
         // Login gagal

@@ -62,7 +62,7 @@
 
             {{-- Right: DASG Connection --}}
             <div class="flex-1 h-[360px] flex flex-col overflow-hidden">
-                <x-ui.toggle-list
+                <x-form.toggle-list
                     :item-id="$itemId"
                     :items="$dasgs"
                     :connected-ids="$item->dasgs->pluck('id')->toArray()"

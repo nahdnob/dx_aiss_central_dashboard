@@ -5,7 +5,6 @@ use App\Http\Controllers\BestRecordController;
 use App\Http\Controllers\CycleTimeController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DasgController;
-use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\LineController;
 use App\Http\Controllers\LinePerformanceController;
 use App\Http\Controllers\MachineController;
@@ -15,7 +14,6 @@ use App\Http\Controllers\PatternHistoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RiskAssessmentController;
 use App\Http\Controllers\SopController;
-use App\Http\Controllers\SystemManagerController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -31,11 +29,8 @@ Route::post('/marqueeText/update', [MarqueeTextController::class, 'update'])->na
 Route::middleware('auth')->group(function () {
     // Features available to every signed-in role.
     Route::middleware('role:admin,leader,user')->group(function () {
-        Route::resource('dashboards', DashboardController::class);
-        // Halaman utama setelah login untuk semua role (sidebar menyesuaikan role).
-        Route::get('/system-managers', [SystemManagerController::class, 'index'])->name('system-managers.index');
-        Route::get('/select-line', [LineController::class, 'index'])->name('line-selector.index');
-        Route::post('/clear-line', [LineController::class, 'clear'])->name('line-selector.clear');
+        // Halaman utama (Home) setelah login untuk semua role (sidebar menyesuaikan role).
+        Route::get('/dashboards', [DashboardController::class, 'index'])->name('dashboards.index');
 
         Route::middleware('line.selected')->group(function () {
             Route::resource('machines', MachineController::class)
@@ -44,7 +39,6 @@ Route::middleware('auth')->group(function () {
             Route::post('/machines/{id}/sop', [MachineController::class, 'attachSop'])->name('machines.sop.attach');
             Route::delete('/machines/{id}/sop/{sopId}', [MachineController::class, 'detachSop'])->name('machines.sop.detach');
 
-            Route::get('/documents', [DocumentController::class, 'index'])->name('documents.index');
             Route::get('/dasgs', [DasgController::class, 'index'])->name('dasgs.index');
             Route::get('/sops', [SopController::class, 'index'])->name('sops.index');
             Route::get('/risk-assessments', [RiskAssessmentController::class, 'index'])->name('risk-assessments.index');

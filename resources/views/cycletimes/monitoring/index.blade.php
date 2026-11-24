@@ -1,4 +1,4 @@
-@extends('layouts.system-manager')
+@extends('layouts.dashboard')
 
 @push('head')
     <meta http-equiv="refresh" content="60">
@@ -30,20 +30,20 @@
                         </p>
                     </div>
                     {{-- Select Mode + Quick Info --}}
-                    <x-cycle-time.mode-switcher :patterns="$patterns" :active-pattern="$activePattern" />
+                    @include('cycletimes.partials.mode-switcher', ['patterns' => $patterns, 'activePattern' => $activePattern])
                 </div>
             </div>
             <!-- Tambahkan tampilan nya disini -->
             {{-- ===== MAIN GRID ===== --}}
             <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
                 {{-- Chart Card (2/3 width) --}}
-                <x-cycle-time.realtime-chart
-                    class="xl:col-span-2"
-                    :data="$realtimeData"
-                    :active-pattern="$activePattern"
-                />
+                @include('cycletimes.partials.realtime-chart', [
+                    'class'         => 'xl:col-span-2',
+                    'data'          => $realtimeData,
+                    'activePattern' => $activePattern,
+                ])
                 {{-- Logs Card (1/3 width) --}}
-                <x-cycle-time.activity-log class="xl:col-span-1" :logs="$recentActivity['logs']" :total="$recentActivity['total']" />
+                @include('cycletimes.partials.activity-log', ['class' => 'xl:col-span-1', 'logs' => $recentActivity['logs'], 'total' => $recentActivity['total']])
             </div>
             {{-- ===== HISTORICAL REPORT & FILTER ===== --}}
             <div class="mb-6">
@@ -127,7 +127,7 @@
                 </div>
             </div>
             {{-- ===== TREND CYCLETIME ===== --}}
-            <x-cycle-time.trend-chart class="mb-6" :data="$scatterData" :pattern="$filterPattern" />
+            @include('cycletimes.partials.trend-chart', ['class' => 'mb-6', 'data' => $scatterData, 'pattern' => $filterPattern])
             {{-- ===== HOURLY SUMMARY ===== --}}
             <div class="flex items-end justify-between mb-3">
                 <div class="ml-2">
@@ -193,7 +193,7 @@
                 @endforelse
             </div>
         </div>
-        <x-layout.footer />
+        <x-footer />
     </div>
 @endsection
 

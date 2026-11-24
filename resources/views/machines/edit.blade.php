@@ -1,11 +1,11 @@
-@extends('layouts.system-manager')
+@extends('layouts.dashboard')
 
 @section('content')
 <div class="p-4 sm:ml-16 mt-14 transition-all duration-300">
     <div class="p-4 min-h-[calc(100vh-5rem)]">
 
         {{-- ===== HERO HEADER ===== --}}
-        <x-layout.page-hero
+        <x-jumbotron
             :title="$machine->asset_name"
             :image="$machine->image_path ? 'storage/machines/images/' . $machine->image_path : null"
             :breadcrumbs="[
@@ -13,15 +13,15 @@
                 ['label' => $machine->asset_no],
             ]">
             Edit machine information and manage linked SOP documents.
-        </x-layout.page-hero>
+        </x-jumbotron>
 
-        <x-machine.summary :machine="$machine" />
+        <x-card.pages.machine-summary :machine="$machine" />
         
-        <x-machine.form-edit :machine="$machine" :errors="$errors" />
+        <x-form.pages.machine-edit :machine="$machine" :errors="$errors" />
 
-        <x-machine.table-sops :machine="$machine" :availableSops="$availableSops" />
+        <x-table.pages.machine-sop :machine="$machine" :availableSops="$availableSops" />
     </div>
-    <x-layout.footer />
+    <x-footer />
 </div>
 
-<x-machine.modal-link-sop :machine="$machine" :availableSops="$availableSops" />
+<x-modal.pages.link-sop :machine="$machine" :availableSops="$availableSops" />
